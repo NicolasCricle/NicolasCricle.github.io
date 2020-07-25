@@ -952,6 +952,20 @@
       </tags>
   </entry>
   <entry>
+    <title>工具网站</title>
+    <url>/2019/08/31/%E6%94%B6%E5%BD%95%E7%9A%84%E5%87%A0%E4%B8%AA%E7%BD%91%E7%AB%99/</url>
+    <content><![CDATA[<h3 id="办公聚合工具"><a href="#办公聚合工具" class="headerlink" title="办公聚合工具"></a>办公聚合工具</h3><p>UZER : <a href="http://uzer.me/" target="_blank" rel="noopener">http://uzer.me</a></p>
+<a id="more"></a>
+<h3 id="格式转换神器"><a href="#格式转换神器" class="headerlink" title="格式转换神器"></a>格式转换神器</h3><p>CONVERTIO : <a href="https://convertio.co/zh/" target="_blank" rel="noopener">https://convertio.co/zh/</a></p>
+]]></content>
+      <categories>
+        <category>工具</category>
+      </categories>
+      <tags>
+        <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>工厂模式之抽象</title>
     <url>/2019/04/10/%E6%8A%BD%E8%B1%A1/</url>
     <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>对于抽象而言，往往用来表征对问题分析设计中得出的抽象概念，是一系列看上去不相同，但却具有相同本质的抽象。抽象是针对一系列具象来说的，对于具体业务场景的不同，我们对同一现实物体会具有不同的抽象结果表现。比如男人和女人，我们抽象出的抽象类可能是Human，而对于男人和狗，我们抽象出来的则可能会是Animal。</p>
@@ -1000,20 +1014,6 @@
       </categories>
       <tags>
         <tag>设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>工具网站</title>
-    <url>/2019/08/31/%E6%94%B6%E5%BD%95%E7%9A%84%E5%87%A0%E4%B8%AA%E7%BD%91%E7%AB%99/</url>
-    <content><![CDATA[<h3 id="办公聚合工具"><a href="#办公聚合工具" class="headerlink" title="办公聚合工具"></a>办公聚合工具</h3><p>UZER : <a href="http://uzer.me/" target="_blank" rel="noopener">http://uzer.me</a></p>
-<a id="more"></a>
-<h3 id="格式转换神器"><a href="#格式转换神器" class="headerlink" title="格式转换神器"></a>格式转换神器</h3><p>CONVERTIO : <a href="https://convertio.co/zh/" target="_blank" rel="noopener">https://convertio.co/zh/</a></p>
-]]></content>
-      <categories>
-        <category>工具</category>
-      </categories>
-      <tags>
-        <tag>工具</tag>
       </tags>
   </entry>
 </search>
