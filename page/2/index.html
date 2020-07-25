@@ -292,7 +292,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/10/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/10/%E6%8A%BD%E8%B1%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="linjiechuang">
@@ -311,7 +311,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/04/10/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/" itemprop="url">工厂模式</a></h1>
+                <a class="post-title-link" href="/2019/04/10/%E6%8A%BD%E8%B1%A1/" itemprop="url">工厂模式之抽象</a></h1>
         
 
         <div class="post-meta">
@@ -364,8 +364,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/04/10/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2019/04/10/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/" itemprop="commentCount"></span>
+                <a href="/2019/04/10/%E6%8A%BD%E8%B1%A1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/04/10/%E6%8A%BD%E8%B1%A1/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -394,13 +394,11 @@
 
       
         
-          <h2 id="设计模式之工厂"><a href="#设计模式之工厂" class="headerlink" title="设计模式之工厂"></a>设计模式之工厂</h2><p>如果说单例模式是最简单的设计模式，那么工厂模式应该是最常见的设计模式之一。我们会在各种各样的地方看见使用工厂模式的痕迹。工厂模式也是属于创建类型，在工厂模式中，们在创建对象时不会对客户端（不是CS建构中的C，一般是指使用工厂的一方）暴露创建逻辑，并且是通过使用一个共同的接口来指向新创建的对象。</p>
-<p>简单来说，就是使用者不关心其实现，而关心其结果和使用。</p>
-<p>工厂模式背后的思想是简化对象的创建。与客户端自己基于类实例化直接创建对象相比，基于一个中心化函数来实现，更易于追踪创建了哪些对象。通过将创建对象的代码和使用对象的代码解耦，工厂能够降低应用维护的复杂度。</p>
-<p>工厂模式，很好的体现了设计原则中的开放封闭原则。</p>
+          <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>对于抽象而言，往往用来表征对问题分析设计中得出的抽象概念，是一系列看上去不相同，但却具有相同本质的抽象。抽象是针对一系列具象来说的，对于具体业务场景的不同，我们对同一现实物体会具有不同的抽象结果表现。比如男人和女人，我们抽象出的抽象类可能是Human，而对于男人和狗，我们抽象出来的则可能会是Animal。</p>
+<p>在面向对象的编程思想中，所有具体的对象都是通过类来实现的。但是反过来，并不是所有的类都是用来描绘对象的，一般我们会把这种类称之为抽象类。我们习惯把现实生活中具有共同特征的事物进行抽象，将其称之为类。而抽象类，则更像是将具有共同特征的类进行抽象。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2019/04/10/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/#more" rel="contents">
+            <a class="btn" href="/2019/04/10/%E6%8A%BD%E8%B1%A1/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
