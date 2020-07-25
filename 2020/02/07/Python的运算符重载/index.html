@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,运算符重载," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Python运算符重载的限制合适的运用运算符重载，能够让你的代码看起来整洁、可读性强。然而，不分场合不分地点的重载运算符，则会是一场灾难。Python对于运算符重载做了一些限制，以平衡其灵活性、安全性以及可用性。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python运算符重载">
+<meta property="og:url" content="http://yoursite.com/2020/02/07/Python%E7%9A%84%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/index.html">
+<meta property="og:site_name" content="linjiechuang">
+<meta property="og:description" content="Python运算符重载的限制合适的运用运算符重载，能够让你的代码看起来整洁、可读性强。然而，不分场合不分地点的重载运算符，则会是一场灾难。Python对于运算符重载做了一些限制，以平衡其灵活性、安全性以及可用性。">
+<meta property="article:published_time" content="2020-02-07T07:34:33.000Z">
+<meta property="article:modified_time" content="2020-07-25T11:43:02.428Z">
+<meta property="article:author" content="linjiechuang">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="运算符重载">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/02/07/Python的运算符重载/"/>
+
+
+
+
+
+  <title>Python运算符重载 | linjiechuang</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f84ed9e2d0812fc306a7a6d239c0a25a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">linjiechuang</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/07/Python%E7%9A%84%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="linjiechuang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="linjiechuang">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python运算符重载</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-07T15:34:33+08:00">
+                2020-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/02/07/Python%E7%9A%84%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/02/07/Python%E7%9A%84%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Python运算符重载的限制"><a href="#Python运算符重载的限制" class="headerlink" title="Python运算符重载的限制"></a>Python运算符重载的限制</h2><p>合适的运用运算符重载，能够让你的代码看起来整洁、可读性强。然而，不分场合不分地点的重载运算符，则会是一场灾难。<br>Python对于运算符重载做了一些限制，以平衡其灵活性、安全性以及可用性。 </p>
+<a id="more"></a>
+<ul>
+<li>不能重载内置数据类型的运算符  </li>
+<li>不能新建运算符，只能重载现有的  </li>
+<li>某些运算符无法进行重载，例如 <strong>is or and not</strong></li>
+</ul>
+<h2 id="一元运算符的重载"><a href="#一元运算符的重载" class="headerlink" title="一元运算符的重载"></a>一元运算符的重载</h2><h3 id="一元运算符介绍"><a href="#一元运算符介绍" class="headerlink" title="一元运算符介绍"></a>一元运算符介绍</h3><p>在Python中 常见的一元运算符是 <strong>+</strong> 以及 <strong>-</strong>，除此之外，还有一个不多见的一元运算符 <strong>~</strong></p>
+<blockquote>
+<p><strong>~</strong> 运算符称之为 位非运算，其定义是将每个二进制取反，详细算法可以自行google，简单的记忆方法为：假如A为整数 ~A == -(A+1)</p>
+</blockquote>
+<blockquote>
+<p><strong>+</strong> 运算符 通常情况下 +A == A总是成立的</p>
+</blockquote>
+<blockquote>
+<p><strong>-</strong> 运算符 取负算术运算符 如果A是-1 则 -A == 1</p>
+</blockquote>
+<h3 id="对应的特殊方法名称"><a href="#对应的特殊方法名称" class="headerlink" title="对应的特殊方法名称"></a>对应的特殊方法名称</h3><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>特殊方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>+</td>
+<td>__neg__</td>
+</tr>
+<tr>
+<td>-</td>
+<td>__pos__</td>
+</tr>
+<tr>
+<td>~</td>
+<td>__invert__</td>
+</tr>
+</tbody></table>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>支持一元运算符很简单，只需要实现相应的特殊方法就行了，并且这几个特殊方法都只有一个参数 <strong>self</strong>，<br>但是要遵循运算符的一个基本法则：始终返还一个新的对象</p>
+<p>为了方便说明接下来的运算符重载，定义一个新的数据类型—向量，实现其基本代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vector</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, x, y)</span>:</span></span><br><span class="line">		self.x = x</span><br><span class="line">		self.y = y</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">"&#123;&#125;(&#123;!r&#125;, &#123;!r&#125;)"</span>.format(self.__class__.__name__, *self)</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> (item <span class="keyword">for</span> item <span class="keyword">in</span> (self.x, self.y))</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__abs__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> math.sqrt(sum(x*x <span class="keyword">for</span> x <span class="keyword">in</span> self))</span><br></pre></td></tr></table></figure>
+<p>需要向量数据结构达到下面的效果</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>v = Vector(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>-v</span><br><span class="line">Vector(<span class="number">-1</span>, <span class="number">-1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>+v</span><br><span class="line">Vector(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>+v <span class="keyword">is</span> v				<span class="comment"># 返还的是一个新的对象</span></span><br><span class="line"><span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<p>为Vector类添加特殊方法,</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__pos__</span><span class="params">(self)</span>:</span></span><br><span class="line">	cls = type(self)</span><br><span class="line">	<span class="keyword">return</span> cls(*self)</span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__neg__</span><span class="params">(self)</span>:</span></span><br><span class="line">	cls = type(self)</span><br><span class="line">	<span class="keyword">return</span> cls(*(-item <span class="keyword">for</span> item <span class="keyword">in</span> self))</span><br></pre></td></tr></table></figure>
+<p>对Vector类来说，已经实现了<strong>iter</strong>方法，并且在其中将构造Vector的数据全部返还，所以在新增的特殊方法中，直接对其使用拆包</p>
+<h2 id="中缀运算符的重载"><a href="#中缀运算符的重载" class="headerlink" title="中缀运算符的重载"></a>中缀运算符的重载</h2><ul>
+<li>中缀运算符 与之前一元运算符+不同，这里的+表示两个对象相加，而不是取正<br>向量加法定义中说明：两个向量可以叠加成一个新的向量。它的各个分量是两个相应向量的对应分量之和</li>
+</ul>
+<h3 id="涉及到的相应地特殊方法"><a href="#涉及到的相应地特殊方法" class="headerlink" title="涉及到的相应地特殊方法"></a>涉及到的相应地特殊方法</h3><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>特殊方法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>self + other</td>
+<td>__add__</td>
+<td>左分派</td>
+</tr>
+<tr>
+<td>other + self</td>
+<td>__radd__</td>
+<td>右分派（后备机制）</td>
+</tr>
+</tbody></table>
+<h3 id="使用-add-以及-radd-计算-a-b-的流程图"><a href="#使用-add-以及-radd-计算-a-b-的流程图" class="headerlink" title="使用__add__以及__radd__计算 a + b 的流程图"></a>使用__add__以及__radd__计算 a + b 的流程图</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">graph LR</span><br><span class="line">    A[a+b]--&gt;B&#123;a有__add__&#125;</span><br><span class="line">    B--Yes--&gt;C[获取a.__add__的结果]</span><br><span class="line">    C--&gt;D&#123;NotImplemented&#125;</span><br><span class="line">    D--No--&gt;E[返回结果]</span><br><span class="line">    D--Yes--&gt;F&#123;b有__radd__&#125;</span><br><span class="line">    B--No--&gt;F</span><br><span class="line">    F--&gt;G[获取b.__radd__的结果]</span><br><span class="line">    G--&gt;H&#123;NotInplemented&#125;</span><br><span class="line">    H--NO--&gt;E</span><br><span class="line">    H--Yes--&gt;I[抛出TypeError]</span><br><span class="line">    F--No--&gt;I</span><br></pre></td></tr></table></figure>
+<p>__radd__是__add__的反向版本，是一种后背的机制，如果左操作数没有实现__add__方法，或者说实现了但是返还的是NotImplemented，那么Python解释器就会调用右操作数的__radd__方法来执行此次的+运算。</p>
+<blockquote>
+<p>NotImplemented 和 NotImplementedError<br>前者是特殊的一个单例值，当中缀运算符特殊方法不能处理给定的操作数的时候，就要把它返回。<br>后者是一种异常，一般由抽象类中的占位方法直接抛出，提醒子类必须覆盖。</p>
+</blockquote>
+<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__add__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	cls = type(self)</span><br><span class="line">	<span class="keyword">try</span>:</span><br><span class="line">		<span class="keyword">return</span> cls(*(x+y <span class="keyword">for</span> x, y <span class="keyword">in</span>  zip(self, other)))</span><br><span class="line">	<span class="keyword">except</span> TypeError:</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">NotImplemented</span></span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__radd__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> self + other</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">对于 \_\_add\_\_来说,将左操作对象与右操作对象 各位叠加，然后生成一个新的Vector返还  </span><br><span class="line">而对于\_\_radd\_\_而言，a + b 本来触动的是 右操作数b的 \_\_radd\_\_方法，在这个方法实现里直接将a, b调换，从而执行 b + a 运算。  </span><br><span class="line">如果other对象是不可迭代的，zip函数会返回TypeError错误，这里将其捕捉，然后统一返回指定错误<span class="built_in">NotImplemented</span></span><br><span class="line"></span><br><span class="line">&gt; zip函数  </span><br><span class="line">&gt; 使用zip函数可以轻松的并行迭代两个或多个可迭代对象，当其中任意一个迭代对象迭代终止的时候，zip函数立即停止，而不会发出警告  </span><br><span class="line">&gt; \&gt;&gt;&gt;a = (<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)    </span><br><span class="line">&gt; \&gt;&gt;&gt;b = (<span class="number">5</span>, <span class="number">6</span>)  </span><br><span class="line">&gt; \&gt;&gt;&gt;list(zip(a, b, fillvalue=<span class="number">0</span>))  </span><br><span class="line">&gt; [(<span class="number">1</span>, <span class="number">5</span>), (<span class="number">2</span>, <span class="number">6</span>)]  </span><br><span class="line">&gt; itertools包中有一个zip\_longest函数，可以设置迭代缺失值  **fillvalue**  </span><br><span class="line">&gt;  \&gt;&gt;&gt;<span class="keyword">import</span> itertools  </span><br><span class="line">&gt;  \&gt;&gt;&gt;functools.zip_longest(a, b, fillvalue=<span class="number">0</span>)  </span><br><span class="line">&gt; [(<span class="number">1</span>, <span class="number">5</span>), (<span class="number">2</span>, <span class="number">6</span>), (<span class="number">3</span>, <span class="number">0</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment">### 其余的中缀运算符</span></span><br><span class="line">|  运算符   | 正向方法  | 反向方法 | 就地方法 | 说明 |</span><br><span class="line">|  ----  | ----  | ---- | ---- | ---- | ---- |</span><br><span class="line">| + | \_\_add\_\_ | \_\_radd\_\_ | \_\_iadd\_\_ | 加法或者拼接 |</span><br><span class="line">| - | \_\_sub\_\_ | \_\_rsub\_\_ | \_\_isub\_\_ | 减法 |</span><br><span class="line">| * | \_\_mul\_\_ | \_\_rmul\_\_ | \_\_imul\_\_ | 乘法 | </span><br><span class="line">| / | \_\_truediv\_\_ | \_\_rturediv\_\_ | \_\_iturediv\_\_ | 除法 |</span><br><span class="line">| // | \_\_floordiv\_\_ | \_\_rfloordiv\_\_ | \_\_floordiv\_\_ | 整除、地板除 |</span><br><span class="line">| % | \_\_mod\_\_ | \_\_rmod\_\_ | \_\_imod\_\_ | 取模 |</span><br><span class="line">| divmod() | \_\_divmod\_\_ | \_\_rdivmod\_\_ | \_\_idivmod\_\_ | 返回由整除的商和模数构成的元祖 |</span><br><span class="line">| ** pow() | \_\_pow\_\_ | \_\_rpow\_\_ | \_\_ipow\_\_ | 幂运算 |</span><br><span class="line">| &amp; | \_\_and\_\_ | \_\_rand\_\_ | \_\_iand\_\_ | 位与运算 |</span><br><span class="line">| \| | \_\_or\_\_ | \_\_ror\_\_ | \_\_ior\_\_ | 位或运算 |</span><br><span class="line">| ^ | \_\_xor\_\_ | \_\_rxor\_\_ | \_\_ixor\_\_ | 位 异或运算 |</span><br><span class="line">| &lt;&lt; | \_\_lshift\_\_ | \_\_rlshift\_\_ | \_\_ilshift\_\_ | 按位左移 |</span><br><span class="line">| &gt;&gt; | \_\_rshift\_\_ | \_\_rrshift\_\_ | \_\_irshift\_\_ | 按位右移 |</span><br><span class="line">| @ | \_\_matmul\_\_ | \_\_rmatmul\_\_ | \_\_imatmul\_\_ | 矩阵乘法（<span class="number">3.5</span>以后Python版本支持） |</span><br><span class="line"></span><br><span class="line"><span class="comment">## 比较运算符的重载</span></span><br><span class="line">在Python中，常见的比较运算符有 **== 、!=、 &gt;、 &lt;、 &gt;=、 &lt;=**。  </span><br><span class="line">对于这些运算符的处理流程与之前的中缀运算符类似，但是也有两个重大的区别：  </span><br><span class="line"></span><br><span class="line">* 正向和反向调用使用的是**一个系列**的方法，比如对于 == 而言，正向调用和反向调用都是用的是 \_\_eq\_\_ 方法， 区别在于参数对调；而 &gt; 的正向调用是  &lt; 的反向调用 \_\_gt\_\_, 反向调用时 &lt; 的正向调用 \_\_lt\_\_。</span><br><span class="line">* 对于 == 以及 != 而言，反向调用失败后并不会直接抛出TypeError， 而是比较对象的ID。  </span><br><span class="line"></span><br><span class="line"><span class="comment">### 涉及到的方法</span></span><br><span class="line">|  运算符   | 特殊方法  |</span><br><span class="line">|  ----  | ----  |</span><br><span class="line">| == | \_\_eq\_\_ |</span><br><span class="line"></span><br><span class="line"><span class="comment">### 代码实现</span></span><br><span class="line">需要达到的效果示下  </span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>Vector(<span class="number">1</span>, <span class="number">2</span>) == Vector(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="literal">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>Vector(<span class="number">1</span>, <span class="number">2</span>) == Vector(<span class="number">2</span>, <span class="number">1</span>)</span><br><span class="line"><span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__eq__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> tuple(self) == tuple(other)</span><br></pre></td></tr></table></figure>
+<p>简单的方法如上，直接按照向量相等的比较规则定义，比较向量的两个分量的大小。<br>但是也会出现如下BUG</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>Vector(<span class="number">1</span>, <span class="number">2</span>) == (<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<p>为防止出现上述问题，可以下改一下__eq__函数，加上类型限定。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__eq__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> isinstance(other, Vector):</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">NotImplemented</span></span><br><span class="line">	<span class="keyword">return</span> tuple(self) == tuple(other)</span><br></pre></td></tr></table></figure>
+<h3 id="其余的比较运算符"><a href="#其余的比较运算符" class="headerlink" title="其余的比较运算符"></a>其余的比较运算符</h3><p>|  运算符   | 正向方法调用  | 反向方法调用 | 后备机制 |<br>|  —-  | —-  | —- | —- | —- |<br>| a==b | a.__eq__(b) | b.__eq__(a) | id(a) == id(b) |<br>| a!=b | a.__ne__(b) | b.__ne__(a) | not (a == b) |<br>| a&gt;b | a.__gt__(b) | b.__lt__(a) | 抛出TypeError |<br>| a&lt;b | a.__lt__(b) | b.__gt__(a) | 抛出TypeError |<br>| a&gt;=b | a.__ge__(b) | b.__le__(a) | 抛出TypeError |<br>| a&lt;=b | a.__le__(b) | b.__ge__(a) | 抛出TypeError |</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/pay/wechat.jpg" alt="linjiechuang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/pay/ali.jpg" alt="linjiechuang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/" rel="tag"># 运算符重载</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/02/Django-%E4%B8%AD%E7%9A%84first/" rel="next" title="Django QuerySet">
+                <i class="fa fa-chevron-left"></i> Django QuerySet
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/02/18/%E5%8F%AF%E8%BF%AD%E4%BB%A3%E5%AF%B9%E8%B1%A1%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E7%94%9F%E6%88%90%E5%99%A8/" rel="prev" title="可迭代对象、迭代器和生成器">
+                可迭代对象、迭代器和生成器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.jpg"
+                alt="linjiechuang" />
+            
+              <p class="site-author-name" itemprop="name">linjiechuang</p>
+              <p class="site-description motion-element" itemprop="description">但行好事莫问前程 兼程行路勿忘初心</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/NicolasCricle" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:17625905485@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Python运算符重载的限制"><span class="nav-number">1.</span> <span class="nav-text">Python运算符重载的限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一元运算符的重载"><span class="nav-number">2.</span> <span class="nav-text">一元运算符的重载</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一元运算符介绍"><span class="nav-number">2.1.</span> <span class="nav-text">一元运算符介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对应的特殊方法名称"><span class="nav-number">2.2.</span> <span class="nav-text">对应的特殊方法名称</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现"><span class="nav-number">2.3.</span> <span class="nav-text">代码实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中缀运算符的重载"><span class="nav-number">3.</span> <span class="nav-text">中缀运算符的重载</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#涉及到的相应地特殊方法"><span class="nav-number">3.1.</span> <span class="nav-text">涉及到的相应地特殊方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-add-以及-radd-计算-a-b-的流程图"><span class="nav-number">3.2.</span> <span class="nav-text">使用__add__以及__radd__计算 a + b 的流程图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现-1"><span class="nav-number">3.3.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其余的比较运算符"><span class="nav-number">3.4.</span> <span class="nav-text">其余的比较运算符</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">linjiechuang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'h8QUIA5X9IkaSOPQT7xHEIPv-gzGzoHsz',
+        appKey: 'iYjdtrqeOsaEqgrfb20TOLE0',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

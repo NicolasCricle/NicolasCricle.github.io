@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,迭代器,生成器,可迭代对象," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="迭代器模式迭代是数据处理的基石，扫描内存中放不下数据集的时候，需要有一种能够惰性获取数据的方法，即按需一次获取一个数据项。这就是迭代器模式（Iterator Patten）。在Python中，实际上是内置了迭代器模式的，避免自己手动实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="可迭代对象、迭代器和生成器">
+<meta property="og:url" content="http://yoursite.com/2020/02/18/%E5%8F%AF%E8%BF%AD%E4%BB%A3%E5%AF%B9%E8%B1%A1%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E7%94%9F%E6%88%90%E5%99%A8/index.html">
+<meta property="og:site_name" content="linjiechuang">
+<meta property="og:description" content="迭代器模式迭代是数据处理的基石，扫描内存中放不下数据集的时候，需要有一种能够惰性获取数据的方法，即按需一次获取一个数据项。这就是迭代器模式（Iterator Patten）。在Python中，实际上是内置了迭代器模式的，避免自己手动实现。">
+<meta property="article:published_time" content="2020-02-18T14:12:41.000Z">
+<meta property="article:modified_time" content="2020-07-25T11:48:49.320Z">
+<meta property="article:author" content="linjiechuang">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="迭代器">
+<meta property="article:tag" content="生成器">
+<meta property="article:tag" content="可迭代对象">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/02/18/可迭代对象、迭代器和生成器/"/>
+
+
+
+
+
+  <title>可迭代对象、迭代器和生成器 | linjiechuang</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f84ed9e2d0812fc306a7a6d239c0a25a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">linjiechuang</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/18/%E5%8F%AF%E8%BF%AD%E4%BB%A3%E5%AF%B9%E8%B1%A1%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E7%94%9F%E6%88%90%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="linjiechuang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="linjiechuang">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">可迭代对象、迭代器和生成器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-18T22:12:41+08:00">
+                2020-02-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/02/18/%E5%8F%AF%E8%BF%AD%E4%BB%A3%E5%AF%B9%E8%B1%A1%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E7%94%9F%E6%88%90%E5%99%A8/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/02/18/%E5%8F%AF%E8%BF%AD%E4%BB%A3%E5%AF%B9%E8%B1%A1%E3%80%81%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%92%8C%E7%94%9F%E6%88%90%E5%99%A8/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="迭代器模式"><a href="#迭代器模式" class="headerlink" title="迭代器模式"></a>迭代器模式</h2><p>迭代是数据处理的基石，扫描内存中放不下数据集的时候，需要有一种能够惰性获取数据的方法，即按需一次获取一个数据项。这就是迭代器模式（Iterator Patten）。<br>在Python中，实际上是内置了迭代器模式的，避免自己手动实现。</p>
+<a id="more"></a>
+<h2 id="可迭代对象"><a href="#可迭代对象" class="headerlink" title="可迭代对象"></a>可迭代对象</h2><p>通常来说，判断一个对象是不是属于某一类，可以使用isinstance的方法，判断可迭代对象也可以使用。<br>isinstance(obj, collections.abc.Iterable)<br>但是会有下面一个现象</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyList</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, iterator)</span>:</span></span><br><span class="line">		self.iterator = list(iterable)</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, index)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> self.iterator[index]</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>m = MyList([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>isinstance(m, coolections.abc.Iterable)</span><br><span class="line"><span class="literal">False</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> m:</span><br><span class="line">··· 	<span class="keyword">print</span> i</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="iter函数"><a href="#iter函数" class="headerlink" title="iter函数"></a>iter函数</h2><p>在MyList的实例并没有通过isinstance的判断，但是MyList的实例依然可以被for循环处理。<br>是因为对象可以被迭代的原因： <strong>iter函数</strong>。<br>内置的iter函数主要会有以下三个方面的作用：  </p>
+<ul>
+<li>检查对象是否实现了__iter__方法，如果实现，调用它获取一个迭代器。</li>
+<li>没有实现__iter__方法，但是实现了__getitem__方法，iter会为其创建一个迭代器，尝试从索引0开始获取元素。</li>
+<li>如果尝试失败，抛出TypeError的异常，并指明实例为不可迭代对象。</li>
+</ul>
+<p><strong>所以，检查一个对象是否可迭代，最准确的方法是调用iter函数，如果不是可迭代对象，捕捉TypeError异常。</strong></p>
+<h2 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h2><p>可迭代对象和迭代器之间的关系：Python从可迭代对象中获取迭代器。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>s = <span class="string">"abc"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> char <span class="keyword">in</span> s:</span><br><span class="line">···		print(char)</span><br><span class="line">a</span><br><span class="line">b</span><br><span class="line">c</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>it = iter(s)							<span class="comment"># 取出迭代器</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">···		<span class="keyword">try</span>:</span><br><span class="line">···			print(next(it))	</span><br><span class="line">···		<span class="keyword">except</span> StopIteration:</span><br><span class="line">···			<span class="keyword">break</span></span><br><span class="line">a</span><br><span class="line">b</span><br><span class="line">c</span><br></pre></td></tr></table></figure>
+<p>next()函数能够返回迭代器的下一个元素，而StopIteration这个异常则表明迭代到头了，在for循环内部，或者的其他迭代上下文中，Python会自己处理这个异常。<br>对于一个标准的迭代器来说，主要实现两个方法</p>
+<ul>
+<li>__iter__ 迭代器的__iter__一般返回自身，也就是self</li>
+<li>__next__ 返回下一个元素</li>
+</ul>
+<h3 id="Python的经典的迭代协议的实现"><a href="#Python的经典的迭代协议的实现" class="headerlink" title="Python的经典的迭代协议的实现"></a>Python的经典的迭代协议的实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyList</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, lis)</span>:</span></span><br><span class="line">		self._lis = lis</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> MyListIterator(self._lis)</span><br><span class="line">		</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyListIterator</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, lis)</span>:</span></span><br><span class="line">		self._lis = lis</span><br><span class="line">		self._index = <span class="number">0</span></span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__next__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">try</span>:</span><br><span class="line">			item = self._lis[self._index]</span><br><span class="line">		<span class="keyword">except</span> IndexError:</span><br><span class="line">			<span class="keyword">raise</span> StopIteration</span><br><span class="line">		</span><br><span class="line">		self._index += <span class="number">1</span></span><br><span class="line">		<span class="keyword">return</span> item</span><br><span class="line">			</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> self</span><br></pre></td></tr></table></figure>
+
+<p>在这个实现中，MyList作为可迭代对象的类，而MyListIteration是生成迭代器的类。<br>在每次可迭代对象需要进行迭代的时候，iter函数都会触法可迭代对象的__iter__的方法，生成一个新的迭代器对象。<br>而每一个独立的迭代器对象在迭代终止的时候，由于其index已经到达终点，无法再次获取元素。</p>
+<h2 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h2><p>只要Pytho中的函数带有yield关键字，该函数就是生成器函数。</p>
+<h3 id="使用生成器函数改写上面的迭代器"><a href="#使用生成器函数改写上面的迭代器" class="headerlink" title="使用生成器函数改写上面的迭代器"></a>使用生成器函数改写上面的迭代器</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyList</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, lis)</span>:</span></span><br><span class="line">		self._lis = lis</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">for</span> item <span class="keyword">in</span> self._lis:</span><br><span class="line">			<span class="keyword">yield</span> item</span><br><span class="line">		<span class="keyword">return</span></span><br></pre></td></tr></table></figure>
+
+<p>使用关键字yield，直接将MyList的__iter__变成一个生成器函数，生成器函数是特殊的迭代器。</p>
+<h3 id="python标准库中的一些常用的生成器函数"><a href="#python标准库中的一些常用的生成器函数" class="headerlink" title="python标准库中的一些常用的生成器函数"></a>python标准库中的一些常用的生成器函数</h3><h4 id="用于过滤的生成器函数"><a href="#用于过滤的生成器函数" class="headerlink" title="用于过滤的生成器函数"></a>用于过滤的生成器函数</h4><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>itertools</td>
+<td>compress(it, selector_it)</td>
+<td>并行的处理两个可迭代的对象，如果select_it的元素是真值，产出it中对应的元素</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>dropwhile(predicate, it)</td>
+<td>使用predicate函数处理it的各个元素，从第一个返回结果为False的开始，然后产出剩下的各个元素</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>takewhile(predicate, it)</td>
+<td>产出predicate 返回真值的时候产生对应的元素，遇到第一个Flase立即停止</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>filter(predicate, it)</td>
+<td>使用predicate函数处理it的各个元素， 如果函数结果返回为真值，产出对应元素。如果predicate函数为None，产出it中为真值的元素</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>filterfalse(predicate, it)</td>
+<td>filter 的对立函数</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>islice(it, stop) 或者 islice(it, start, stop, step=1)</td>
+<td>产出it的切片，it[: stop] 或者 it[start: stop: step]， it可以是任何可迭代对象</td>
+</tr>
+</tbody></table>
+<h5 id="compress-it-selector-it"><a href="#compress-it-selector-it" class="headerlink" title="compress(it, selector_it)"></a>compress(it, selector_it)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>name = <span class="string">"linjiechuang"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(compress(name, [<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]))</span><br><span class="line">[<span class="string">'l'</span>, <span class="string">'n'</span>, <span class="string">'i'</span>, <span class="string">'c'</span>, <span class="string">'h'</span>, <span class="string">'u'</span>, <span class="string">'a'</span>, <span class="string">'n'</span>, <span class="string">'g'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(conpress(name, [<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>]))</span><br><span class="line">[<span class="string">'l'</span>, <span class="string">'n'</span>]</span><br></pre></td></tr></table></figure>
+
+<h5 id="dropwhile-predicate-it"><a href="#dropwhile-predicate-it" class="headerlink" title="dropwhile(predicate, it)"></a>dropwhile(predicate, it)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>name = <span class="string">"zzmmoozz"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(dropwhile(<span class="keyword">lambda</span> x: x <span class="keyword">in</span> <span class="string">"zo"</span>, name))</span><br><span class="line">[<span class="string">'m'</span>, <span class="string">'m'</span>, <span class="string">'o'</span>, <span class="string">'o'</span>, <span class="string">'z'</span>, <span class="string">'z'</span>]</span><br></pre></td></tr></table></figure>
+<p>lambda 做检查，当第一个元素‘z’传递进去的时候，返回True，继续检查；第二个元素传递进去返回还是True；第三个例子传递进去，返回时False， 从此不再检查，剩下元素直接需要的时候返回。</p>
+<h5 id="takewhile-predicate-it"><a href="#takewhile-predicate-it" class="headerlink" title="takewhile(predicate, it)"></a>takewhile(predicate, it)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>name = <span class="string">"zzmmoozz"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(takewhile(<span class="keyword">lambda</span> x: x <span class="keyword">in</span> <span class="string">"zo"</span>, name))</span><br><span class="line">[<span class="string">'z'</span>, <span class="string">'z'</span>]</span><br></pre></td></tr></table></figure>
+<p>与dropwhile类似，但是相反，dropwhile是遇到第一个非真值开始产出，而takewhile遇到第一个非真值停止。</p>
+<h5 id="filter-predicate-it"><a href="#filter-predicate-it" class="headerlink" title="filter(predicate, it)"></a>filter(predicate, it)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>name = <span class="string">"zzmmoozz"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(filter(<span class="keyword">lambda</span> x: x <span class="keyword">in</span> <span class="string">"zo"</span>, name))</span><br><span class="line">[<span class="string">'z'</span>, <span class="string">'z'</span>, <span class="string">'o'</span>, <span class="string">'o'</span>, <span class="string">'z'</span>, <span class="string">'z'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>numbers = [<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(filter(<span class="literal">None</span>, numbers))</span><br><span class="line">[<span class="number">1</span>, <span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+<p>filter 有一个特性是predicate函数是可以为None的，当predicate为None的时候，filter直接将it中的真值元素筛选出来。</p>
+<h5 id="filterfalse-predicate-it"><a href="#filterfalse-predicate-it" class="headerlink" title="filterfalse(predicate, it)"></a>filterfalse(predicate, it)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>name = <span class="string">"zzmmoozz"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(filterfalse(<span class="keyword">lambda</span> x: x <span class="keyword">in</span> <span class="string">"zo"</span>, name))</span><br><span class="line">[<span class="string">'m'</span>, <span class="string">'m]</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; numbers = [1, 0, 1, 0]</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; list(filterfalse(None, numbers))</span></span><br><span class="line"><span class="string">[0, 0]</span></span><br></pre></td></tr></table></figure>
+<p>与filter函数的检查条件相反。</p>
+<h5 id="islice-it-start-stop-step-islice-it-stop"><a href="#islice-it-start-stop-step-islice-it-stop" class="headerlink" title="islice(it, start, stop, step)/islice(it, stop)"></a>islice(it, start, stop, step)/islice(it, stop)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>t = (<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(islice(<span class="number">1</span>, <span class="number">3</span>, <span class="number">1</span>))</span><br><span class="line">[<span class="number">2</span>, ,<span class="number">3</span>]</span><br></pre></td></tr></table></figure>
+
+<h4 id="用于映射的生成器函数"><a href="#用于映射的生成器函数" class="headerlink" title="用于映射的生成器函数"></a>用于映射的生成器函数</h4><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>itertools</td>
+<td>accmulate(it, [func, ])</td>
+<td>产生累计的总和， 如果提供了func， 将前两个元素传递给它，返回计算结果， 然后把计算结果和下一个元素传递给它， 以此类推</td>
+</tr>
+<tr>
+<td>内置</td>
+<td>emumerate(it, start=0)</td>
+<td>产生两个元素组成的元祖，第一个元素是index， 从start开始计数，第二个元素是对应index的it的值</td>
+</tr>
+<tr>
+<td>内置</td>
+<td>map(func, it, [it2, it3…])</td>
+<td>把it中的元素传递给func，产出结果， it的个数与func的参数相等</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>starmap(func, it)</td>
+<td>将it中的元素传给func， 然后产出结果</td>
+</tr>
+</tbody></table>
+<h5 id="accumulate-it-func"><a href="#accumulate-it-func" class="headerlink" title="accumulate(it, [func, ])"></a>accumulate(it, [func, ])</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(accumulate(range(<span class="number">10</span>)))</span><br><span class="line">[<span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="number">15</span>, <span class="number">21</span>, <span class="number">28</span>, <span class="number">36</span>, <span class="number">45</span>]		<span class="comment"># 分别为前1项累加和， 前2项累加和......前n项累加和</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>numbers = [<span class="number">2</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(accmulate(numbers, min))</span><br><span class="line">[<span class="number">2</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(accmulate(numbers, max))</span><br><span class="line">[<span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>]</span><br></pre></td></tr></table></figure>
+
+<h5 id="enumerate-it-start-0"><a href="#enumerate-it-start-0" class="headerlink" title="enumerate(it, start=0)"></a>enumerate(it, start=0)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> enumerate(range(<span class="number">3</span>), start=<span class="number">1</span>):</span><br><span class="line">···		print(<span class="string">"&#123;index&#125;---&#123;item&#125;"</span>.format(*i))</span><br><span class="line">···</span><br><span class="line"><span class="number">1</span>--<span class="number">-0</span></span><br><span class="line"><span class="number">2</span>--<span class="number">-1</span></span><br><span class="line"><span class="number">3</span>--<span class="number">-2</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="map-func-it-it2-it3……"><a href="#map-func-it-it2-it3……" class="headerlink" title="map(func, it, [it2, it3……])"></a>map(func, it, [it2, it3……])</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(map(operator.mul, range(<span class="number">10</span>), [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]))</span><br><span class="line">[<span class="number">0</span>, <span class="number">2</span>, <span class="number">6</span>]</span><br></pre></td></tr></table></figure>
+
+<h5 id="startmap-func-it"><a href="#startmap-func-it" class="headerlink" title="startmap(func, it)"></a>startmap(func, it)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(starmap(operator.mul, [(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">2</span>, <span class="number">4</span>)]))</span><br><span class="line">[<span class="number">2</span>, <span class="number">8</span>]</span><br></pre></td></tr></table></figure>
+<p>对于starmap而言，参数it的元素也必须是可迭代的。</p>
+<h4 id="合并多个可迭代对象的生成器"><a href="#合并多个可迭代对象的生成器" class="headerlink" title="合并多个可迭代对象的生成器"></a>合并多个可迭代对象的生成器</h4><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>itertools</td>
+<td>chain(it1,…itN)</td>
+<td>先产出it1中的元素，在产出it2中的元素，直到itN， 无缝衔接</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>chain.from_iterable(it)</td>
+<td>it产出的元素是可迭代的，将其中的元素依次迭代出来，无缝衔接</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>product(it1,…itN, repeat=1)</td>
+<td>计算笛卡尔积，与for循环嵌套一样</td>
+</tr>
+<tr>
+<td>内置</td>
+<td>zip(it1, …, itN)</td>
+<td>并行获取可迭代对象中的元素，并且以元祖的形式组合并返还，只要有一个对象停止迭代整个行为就停止</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>zip_longest(it1,…,itN)</td>
+<td>与zip类似，不过停止的标准是迭代完最长的可迭代对象，空缺值由fillvalue填充</td>
+</tr>
+</tbody></table>
+<h5 id="chain-it1-…-itN"><a href="#chain-it1-…-itN" class="headerlink" title="chain(it1, …, itN)"></a>chain(it1, …, itN)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(chain(enumerate([<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>])))</span><br><span class="line">[(<span class="number">0</span>, <span class="string">'a'</span>), (<span class="number">1</span>, <span class="string">'b'</span>), (<span class="number">2</span>, <span class="string">'c'</span>)]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(chain([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]))</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]</span><br></pre></td></tr></table></figure>
+
+<h5 id="chain-from-iter-it1-…-itN"><a href="#chain-from-iter-it1-…-itN" class="headerlink" title="chain.from_iter(it1, …, itN)"></a>chain.from_iter(it1, …, itN)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(chain.from_iterable(enumerate([<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>])))</span><br><span class="line">[<span class="number">0</span>, <span class="string">'a'</span>, <span class="number">1</span>, <span class="string">'b'</span>, <span class="number">2</span>, <span class="string">'c'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(chain.from_iterable([[<span class="number">1</span>, <span class="number">2</span>], [<span class="number">3</span>, <span class="number">4</span>], [<span class="number">5</span>, <span class="number">6</span>]]))</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]</span><br></pre></td></tr></table></figure>
+
+<h5 id="zip-it1-…-itN"><a href="#zip-it1-…-itN" class="headerlink" title="zip(it1, …, itN)"></a>zip(it1, …, itN)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(zip([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>]))</span><br><span class="line">[(<span class="number">1</span>, <span class="number">4</span>), (<span class="number">2</span>, <span class="number">5</span>)]</span><br></pre></td></tr></table></figure>
+
+<h5 id="zip-longest-it1-…-itN"><a href="#zip-longest-it1-…-itN" class="headerlink" title="zip_longest(it1, …, itN)"></a>zip_longest(it1, …, itN)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(zip_longest([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>]))</span><br><span class="line">[(<span class="number">1</span>, <span class="number">4</span>), (<span class="number">2</span>, <span class="number">5</span>), (<span class="number">3</span>, <span class="literal">None</span>)]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(zip_longest([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>], fillvalue=<span class="number">0</span>))</span><br><span class="line">[(<span class="number">1</span>, <span class="number">4</span>), (<span class="number">2</span>, <span class="number">5</span>), (<span class="number">3</span>, <span class="number">0</span>)]</span><br></pre></td></tr></table></figure>
+
+<h5 id="product-it1-…-itN-repeat-1"><a href="#product-it1-…-itN-repeat-1" class="headerlink" title="product(it1, …, itN, repeat=1)"></a>product(it1, …, itN, repeat=1)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(product(<span class="string">'abc'</span>, range(<span class="number">2</span>)))</span><br><span class="line">[(<span class="string">'a'</span>, <span class="number">0</span>), (<span class="string">'a'</span>, <span class="number">1</span>), (<span class="string">'b'</span>, <span class="number">0</span>), (<span class="string">'b'</span>, <span class="number">1</span>), (<span class="string">'c'</span>, <span class="number">0</span>), (<span class="string">'c'</span>, <span class="number">1</span>)]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>len(set(product(range(<span class="number">3</span>), range(<span class="number">3</span>), range(<span class="number">3</span>))))</span><br><span class="line"><span class="number">27</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>len(set(product(range(<span class="number">3</span>), repeat=<span class="number">3</span>)))</span><br><span class="line"><span class="number">27</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="把输入的各个元素扩展成多个输出元素的生成器函数"><a href="#把输入的各个元素扩展成多个输出元素的生成器函数" class="headerlink" title="把输入的各个元素扩展成多个输出元素的生成器函数"></a>把输入的各个元素扩展成多个输出元素的生成器函数</h4><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>itertools</td>
+<td>combinations(it, out_len)</td>
+<td>把it产出的out_len个元素组合在一起然后产出，不包含相同的元素</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>combinations_with_replacement(it, out_len)</td>
+<td>与combinations大体相同，但是包含相同元素</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>count(start=0, step=0)</td>
+<td>从start开始产出数字等差数列，差值是step</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>cycle(it)</td>
+<td>从it中获取各个元素，存储其副本，按顺序循环不断的产出</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>permutations(it, out_len=None)</td>
+<td>对it的元素进行out_len的全排列， 与combinations_with_replacement类似，但是强调顺序</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>repeat(item, [times,])</td>
+<td>重复产生item，直到times次</td>
+</tr>
+</tbody></table>
+<h5 id="combinations-it-out-len"><a href="#combinations-it-out-len" class="headerlink" title="combinations(it, out_len)"></a>combinations(it, out_len)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(combinations(<span class="string">'abc'</span>, <span class="number">2</span>))</span><br><span class="line">[(<span class="string">'a'</span>, <span class="string">'b'</span>), (<span class="string">'a'</span>, <span class="string">'c'</span>), (<span class="string">'b'</span>, <span class="string">'c'</span>)]</span><br></pre></td></tr></table></figure>
+
+<h5 id="combinations-with-replacement-it-out-len"><a href="#combinations-with-replacement-it-out-len" class="headerlink" title="combinations_with_replacement(it, out_len)"></a>combinations_with_replacement(it, out_len)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(combinations_with_replacement(<span class="string">'abc'</span>, <span class="number">2</span>))</span><br><span class="line">[(<span class="string">'a'</span>, <span class="string">'a'</span>), (<span class="string">'a'</span>, <span class="string">'b'</span>), (<span class="string">'a'</span>, <span class="string">'c'</span>), (<span class="string">'b'</span>, <span class="string">'b'</span>), (<span class="string">'b'</span>, <span class="string">'c'</span>), (<span class="string">'c'</span>, <span class="string">'c'</span>)]</span><br></pre></td></tr></table></figure>
+
+<h5 id="count-start-0-step-0"><a href="#count-start-0-step-0" class="headerlink" title="count(start=0, step=0)"></a>count(start=0, step=0)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(itertools.islice(itertools.count(start=<span class="number">3</span>, step=<span class="number">6</span>), <span class="number">1</span>, <span class="number">4</span>))</span><br><span class="line">[<span class="number">9</span>, <span class="number">15</span>, <span class="number">21</span>]</span><br></pre></td></tr></table></figure>
+<p>count()如果不加参数，直接list()初始化，那么就会无限重复下去</p>
+<h5 id="cycle-it"><a href="#cycle-it" class="headerlink" title="cycle(it)"></a>cycle(it)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> item <span class="keyword">in</span> cycle(<span class="string">"abc"</span>):</span><br><span class="line">··· 	print(item)</span><br><span class="line">···</span><br><span class="line">a</span><br><span class="line">b</span><br><span class="line">c</span><br><span class="line">a</span><br><span class="line">b</span><br><span class="line">c</span><br><span class="line">...... <span class="comment"># 一直重复</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="permutations-it-out-len"><a href="#permutations-it-out-len" class="headerlink" title="permutations(it, out_len)"></a>permutations(it, out_len)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(permutations(<span class="string">'abc'</span>, <span class="number">2</span>))</span><br><span class="line">[(<span class="string">'a'</span>, <span class="string">'b'</span>), (<span class="string">'a'</span>, <span class="string">'c'</span>), (<span class="string">'b'</span>, <span class="string">'a'</span>), (<span class="string">'b'</span>, <span class="string">'c'</span>), (<span class="string">'c'</span>, <span class="string">'a'</span>), (<span class="string">'c'</span>, <span class="string">'b'</span>)]</span><br></pre></td></tr></table></figure>
+<p>permutations与combinations_with_replacement看起来有点儿类似，但是后者是顺序产生的，不会出现‘ba’这样的元素，而permutations更类似于不重复的全排列。</p>
+<h5 id="repeat-item-times"><a href="#repeat-item-times" class="headerlink" title="repeat(item, times)"></a>repeat(item, times)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(repeat(<span class="number">1</span>, <span class="number">5</span>))</span><br><span class="line">[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+
+<h4 id="重新排列元素的生成器"><a href="#重新排列元素的生成器" class="headerlink" title="重新排列元素的生成器"></a>重新排列元素的生成器</h4><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>itertools</td>
+<td>groupby(it, key=None)</td>
+<td>产生的元素形式如(key, group)， 其中key是group的分组依据， group就是分的组</td>
+</tr>
+<tr>
+<td>itertools</td>
+<td>tee(it, n=2)</td>
+<td>产生一个有n个it组成的元组</td>
+</tr>
+<tr>
+<td>内置</td>
+<td>reversed(seq)</td>
+<td>反转，对象必须是序列，或者实现了__reversed__</td>
+</tr>
+</tbody></table>
+<h5 id="groupby-it-key-None"><a href="#groupby-it-key-None" class="headerlink" title="groupby(it, key=None)"></a>groupby(it, key=None)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> key, it <span class="keyword">in</span> groupby(<span class="string">'zzmmoozz'</span>):</span><br><span class="line">···		print(key, list(it))</span><br><span class="line">···</span><br><span class="line">z [<span class="string">'z'</span>, <span class="string">'z'</span>]</span><br><span class="line">m [<span class="string">'m'</span>, <span class="string">'m'</span>]</span><br><span class="line">o [<span class="string">'o'</span>, <span class="string">'o'</span>]</span><br><span class="line">z [<span class="string">'z'</span>, <span class="string">'z'</span>]</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> key, it <span class="keyword">in</span> groupby(<span class="string">'mmoozzzz'</span>):</span><br><span class="line">···		print(key, list(it))</span><br><span class="line">···</span><br><span class="line">m [<span class="string">'m'</span>, <span class="string">'m'</span>]</span><br><span class="line">o [<span class="string">'o'</span>, <span class="string">'o'</span>]</span><br><span class="line">z [<span class="string">'z'</span>, <span class="string">'z'</span>, <span class="string">'z'</span>, <span class="string">'z'</span>]</span><br></pre></td></tr></table></figure>
+<p>使用groupby之前，经可能的先排序，groupby是从前向后找，不回头。</p>
+<h5 id="tee-it-n-2"><a href="#tee-it-n-2" class="headerlink" title="tee(it, n=2)"></a>tee(it, n=2)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> item <span class="keyword">in</span> tee([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]):</span><br><span class="line">···		print(list(item))</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br></pre></td></tr></table></figure>
+
+<h5 id="reversed-seq"><a href="#reversed-seq" class="headerlink" title="reversed(seq)"></a>reversed(seq)</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>a = <span class="string">"123456"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(reversed(a))</span><br><span class="line">···	<span class="string">"654321"</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="iter函数其它的用途"><a href="#iter函数其它的用途" class="headerlink" title="iter函数其它的用途"></a>iter函数其它的用途</h2><p>除了获取可迭代对象的迭代器之外，iter函数还有其他的用途<br>当iter接受两个参数的时候，第一个参数必须是可调用对象，用于不断的调用（没有参数值），第二个是标记值，当第一个参数的返回值等于标记值的时候，iter结束自身行为。<br>以下场景：通过randint函数来模拟掷骰子，不管扔多少次，仍到6就停止。  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">get_six</span><span class="params">()</span>:</span></span><br><span class="line">···		<span class="keyword">return</span> random.randint(<span class="number">1</span>, <span class="number">6</span>)</span><br><span class="line">···</span><br><span class="line">&gt;&gt;&gt;<span class="keyword">for</span> item <span class="keyword">in</span>  iter(get_six, <span class="number">6</span>):</span><br><span class="line">···		print(item)</span><br><span class="line">···</span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">5</span></span><br></pre></td></tr></table></figure>
+<p>由于get_six的返回值为6的时候，iter函数的行为就终止了，所以并不会将数值6打印出来<br>iter官方介绍用例的时候，使用的是读取文件的案例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open(filePath) <span class="keyword">as</span> f:</span><br><span class="line">	<span class="keyword">for</span> line <span class="keyword">in</span> iter(f.readline, <span class="string">"\n"</span>):</span><br><span class="line">		process_line(line)</span><br></pre></td></tr></table></figure>
+<p>打开文件后，逐行读取文件，直到遇到空行或者文件结束为止。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/pay/wechat.jpg" alt="linjiechuang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/pay/ali.jpg" alt="linjiechuang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/%E8%BF%AD%E4%BB%A3%E5%99%A8/" rel="tag"># 迭代器</a>
+          
+            <a href="/tags/%E7%94%9F%E6%88%90%E5%99%A8/" rel="tag"># 生成器</a>
+          
+            <a href="/tags/%E5%8F%AF%E8%BF%AD%E4%BB%A3%E5%AF%B9%E8%B1%A1/" rel="tag"># 可迭代对象</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/02/07/Python%E7%9A%84%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/" rel="next" title="Python运算符重载">
+                <i class="fa fa-chevron-left"></i> Python运算符重载
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/02/27/Python%20%E5%8A%A8%E6%80%81%E5%B1%9E%E6%80%A7%E5%92%8C%E7%89%B9%E6%80%A7/" rel="prev" title="Python中的动态属性">
+                Python中的动态属性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.jpg"
+                alt="linjiechuang" />
+            
+              <p class="site-author-name" itemprop="name">linjiechuang</p>
+              <p class="site-description motion-element" itemprop="description">但行好事莫问前程 兼程行路勿忘初心</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/NicolasCricle" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:17625905485@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代器模式"><span class="nav-number">1.</span> <span class="nav-text">迭代器模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可迭代对象"><span class="nav-number">2.</span> <span class="nav-text">可迭代对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iter函数"><span class="nav-number">3.</span> <span class="nav-text">iter函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代器"><span class="nav-number">4.</span> <span class="nav-text">迭代器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Python的经典的迭代协议的实现"><span class="nav-number">4.1.</span> <span class="nav-text">Python的经典的迭代协议的实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成器"><span class="nav-number">5.</span> <span class="nav-text">生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用生成器函数改写上面的迭代器"><span class="nav-number">5.1.</span> <span class="nav-text">使用生成器函数改写上面的迭代器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python标准库中的一些常用的生成器函数"><span class="nav-number">5.2.</span> <span class="nav-text">python标准库中的一些常用的生成器函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#用于过滤的生成器函数"><span class="nav-number">5.2.1.</span> <span class="nav-text">用于过滤的生成器函数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#compress-it-selector-it"><span class="nav-number">5.2.1.1.</span> <span class="nav-text">compress(it, selector_it)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#dropwhile-predicate-it"><span class="nav-number">5.2.1.2.</span> <span class="nav-text">dropwhile(predicate, it)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#takewhile-predicate-it"><span class="nav-number">5.2.1.3.</span> <span class="nav-text">takewhile(predicate, it)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#filter-predicate-it"><span class="nav-number">5.2.1.4.</span> <span class="nav-text">filter(predicate, it)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#filterfalse-predicate-it"><span class="nav-number">5.2.1.5.</span> <span class="nav-text">filterfalse(predicate, it)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#islice-it-start-stop-step-islice-it-stop"><span class="nav-number">5.2.1.6.</span> <span class="nav-text">islice(it, start, stop, step)&#x2F;islice(it, stop)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#用于映射的生成器函数"><span class="nav-number">5.2.2.</span> <span class="nav-text">用于映射的生成器函数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#accumulate-it-func"><span class="nav-number">5.2.2.1.</span> <span class="nav-text">accumulate(it, [func, ])</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#enumerate-it-start-0"><span class="nav-number">5.2.2.2.</span> <span class="nav-text">enumerate(it, start&#x3D;0)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#map-func-it-it2-it3……"><span class="nav-number">5.2.2.3.</span> <span class="nav-text">map(func, it, [it2, it3……])</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#startmap-func-it"><span class="nav-number">5.2.2.4.</span> <span class="nav-text">startmap(func, it)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#合并多个可迭代对象的生成器"><span class="nav-number">5.2.3.</span> <span class="nav-text">合并多个可迭代对象的生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#chain-it1-…-itN"><span class="nav-number">5.2.3.1.</span> <span class="nav-text">chain(it1, …, itN)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#chain-from-iter-it1-…-itN"><span class="nav-number">5.2.3.2.</span> <span class="nav-text">chain.from_iter(it1, …, itN)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#zip-it1-…-itN"><span class="nav-number">5.2.3.3.</span> <span class="nav-text">zip(it1, …, itN)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#zip-longest-it1-…-itN"><span class="nav-number">5.2.3.4.</span> <span class="nav-text">zip_longest(it1, …, itN)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#product-it1-…-itN-repeat-1"><span class="nav-number">5.2.3.5.</span> <span class="nav-text">product(it1, …, itN, repeat&#x3D;1)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#把输入的各个元素扩展成多个输出元素的生成器函数"><span class="nav-number">5.2.4.</span> <span class="nav-text">把输入的各个元素扩展成多个输出元素的生成器函数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#combinations-it-out-len"><span class="nav-number">5.2.4.1.</span> <span class="nav-text">combinations(it, out_len)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#combinations-with-replacement-it-out-len"><span class="nav-number">5.2.4.2.</span> <span class="nav-text">combinations_with_replacement(it, out_len)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#count-start-0-step-0"><span class="nav-number">5.2.4.3.</span> <span class="nav-text">count(start&#x3D;0, step&#x3D;0)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#cycle-it"><span class="nav-number">5.2.4.4.</span> <span class="nav-text">cycle(it)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#permutations-it-out-len"><span class="nav-number">5.2.4.5.</span> <span class="nav-text">permutations(it, out_len)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#repeat-item-times"><span class="nav-number">5.2.4.6.</span> <span class="nav-text">repeat(item, times)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重新排列元素的生成器"><span class="nav-number">5.2.5.</span> <span class="nav-text">重新排列元素的生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#groupby-it-key-None"><span class="nav-number">5.2.5.1.</span> <span class="nav-text">groupby(it, key&#x3D;None)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#tee-it-n-2"><span class="nav-number">5.2.5.2.</span> <span class="nav-text">tee(it, n&#x3D;2)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#reversed-seq"><span class="nav-number">5.2.5.3.</span> <span class="nav-text">reversed(seq)</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iter函数其它的用途"><span class="nav-number">6.</span> <span class="nav-text">iter函数其它的用途</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">linjiechuang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'h8QUIA5X9IkaSOPQT7xHEIPv-gzGzoHsz',
+        appKey: 'iYjdtrqeOsaEqgrfb20TOLE0',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

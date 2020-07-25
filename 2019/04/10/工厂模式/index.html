@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="设计模式," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="设计模式之工厂如果说单例模式是最简单的设计模式，那么工厂模式应该是最常见的设计模式之一。我们会在各种各样的地方看见使用工厂模式的痕迹。工厂模式也是属于创建类型，在工厂模式中，们在创建对象时不会对客户端（不是CS建构中的C，一般是指使用工厂的一方）暴露创建逻辑，并且是通过使用一个共同的接口来指向新创建的对象。 简单来说，就是使用者不关心其实现，而关心其结果和使用。 工厂模式背后的思想是简化对象的创建">
+<meta property="og:type" content="article">
+<meta property="og:title" content="工厂模式">
+<meta property="og:url" content="http://yoursite.com/2019/04/10/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="linjiechuang">
+<meta property="og:description" content="设计模式之工厂如果说单例模式是最简单的设计模式，那么工厂模式应该是最常见的设计模式之一。我们会在各种各样的地方看见使用工厂模式的痕迹。工厂模式也是属于创建类型，在工厂模式中，们在创建对象时不会对客户端（不是CS建构中的C，一般是指使用工厂的一方）暴露创建逻辑，并且是通过使用一个共同的接口来指向新创建的对象。 简单来说，就是使用者不关心其实现，而关心其结果和使用。 工厂模式背后的思想是简化对象的创建">
+<meta property="article:published_time" content="2019-04-10T11:43:01.000Z">
+<meta property="article:modified_time" content="2020-07-25T11:45:59.466Z">
+<meta property="article:author" content="linjiechuang">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/10/工厂模式/"/>
+
+
+
+
+
+  <title>工厂模式 | linjiechuang</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f84ed9e2d0812fc306a7a6d239c0a25a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">linjiechuang</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/10/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="linjiechuang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="linjiechuang">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">工厂模式</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-10T19:43:01+08:00">
+                2019-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/04/10/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/04/10/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="设计模式之工厂"><a href="#设计模式之工厂" class="headerlink" title="设计模式之工厂"></a>设计模式之工厂</h2><p>如果说单例模式是最简单的设计模式，那么工厂模式应该是最常见的设计模式之一。我们会在各种各样的地方看见使用工厂模式的痕迹。工厂模式也是属于创建类型，在工厂模式中，们在创建对象时不会对客户端（不是CS建构中的C，一般是指使用工厂的一方）暴露创建逻辑，并且是通过使用一个共同的接口来指向新创建的对象。</p>
+<p>简单来说，就是使用者不关心其实现，而关心其结果和使用。</p>
+<p>工厂模式背后的思想是简化对象的创建。与客户端自己基于类实例化直接创建对象相比，基于一个中心化函数来实现，更易于追踪创建了哪些对象。通过将创建对象的代码和使用对象的代码解耦，工厂能够降低应用维护的复杂度。</p>
+<p>工厂模式，很好的体现了设计原则中的开放封闭原则。</p>
+<a id="more"></a>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><ol>
+<li>对于数据库的访问，在客户端使用之前，我们并不知道客户端将基于何种数据库链接，有肯能是MySQL，有可能是MongoDB，也可能其它。具体会用哪一种，完全依赖于用户的输入/配置项。而客户端不关心我们的连接的具体实现。</li>
+<li>记得有段时间不少app推出夜间模式和白天模式，用户输入的仅仅是白天/夜间。而app从展现的内容到推送的消息完全不一样，这也是工厂模式的一种应用。</li>
+</ol>
+<h2 id="简单的工厂模式"><a href="#简单的工厂模式" class="headerlink" title="简单的工厂模式"></a>简单的工厂模式</h2><p>在简单工厂模式中，可以根据参数的不同返回不同类的实例。简单工厂模式专门定义一个类来负责创建其他类的实例，被创建的实例通常都具有共同的父类。</p>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><p>作为一个人，吃饭是我的本能；而作为一个中国人，我吃饭口味的选择就很多。我可能想吃川菜、粤菜、湘菜等等。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Me</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook_cc</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u chuan cai"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook_yc</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u yue cai"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook_xc</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u xiang cai"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"eating......"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">do</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.cook_cc()</span><br><span class="line">        self.eat()</span><br></pre></td></tr></table></figure>
+<p>上述代码描述了我在吃川菜，那么会出现一种情况，我第二天不想吃川菜了，我想吃的是粤菜，那么我就要修改代码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">do</span><span class="params">(self)</span>:</span></span><br><span class="line">    self.cook_yc()</span><br><span class="line">    self.eat()</span><br></pre></td></tr></table></figure>
+<p>看似好像解决了，可是如果我第三天想吃的是湘菜，第四天又回过头想吃粤菜了…..无穷无尽的修改。作为一个懒惰的码农，是绝对不能允许这种事情发生的。于是将上面的代码彻底改一下。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Me</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook_cc</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u chuan cai"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook_yc</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u yue cai"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook_xc</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u xiang cai"</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"eating......"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">do</span><span class="params">(self, flavour)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> flavour == <span class="string">"cc"</span>:</span><br><span class="line">            self.cook_cc()</span><br><span class="line">        <span class="keyword">elif</span> flavour == <span class="string">"yc"</span>:</span><br><span class="line">            self.cook_yc()</span><br><span class="line">        <span class="keyword">elif</span> flavour == <span class="string">"xc"</span>:</span><br><span class="line">            self.cook_xc()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">raise</span> <span class="string">"undefine flavour"</span></span><br><span class="line">        self.eat()</span><br></pre></td></tr></table></figure>
+<p>给eat()添加了参数，这下每天只要告诉自己喜欢什么口味，自己再去做相应的口味就行了。</p>
+<p>等等，自己做？我是一个码农，做饭并不是我擅长的事情，专业的事情要交给专业的人做，做饭的事情，当然还是交给厨子好了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChuanCooker</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u chuan cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YueCooker</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u yue cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">XiangCooker</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u xiang cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Me</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"eating......"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">do</span><span class="params">(self, flavour)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> flavour == <span class="string">"cc"</span>:</span><br><span class="line">            cooker = ChuanCooker()</span><br><span class="line">        <span class="keyword">elif</span> flavour == <span class="string">"yc"</span>:</span><br><span class="line">            cooker = YueCooker()</span><br><span class="line">        <span class="keyword">elif</span> flavour == <span class="string">"xc"</span>:</span><br><span class="line">            cooker = XiangCooker()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">raise</span> <span class="string">"undefine flavour"</span></span><br><span class="line">        cooker.cook()</span><br><span class="line">        self.eat()</span><br></pre></td></tr></table></figure>
+<p>现在，我们将做饭这件事情从我们身上剥离出去了，交给了专业的厨师来做。这只是极端情况下的模拟，真实的场景可能要复杂的多，比如厨师，不管是哪里的厨师，cook前都要买菜，洗菜，他们可能还要和助手交流，这些都是他们的共性，我们可以将这个共性厨师身上剥离出来。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseCooker</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wash</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"xi cai"</span>)</span><br><span class="line">    </span><br><span class="line">    ......共性方法</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChuanCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u chuan cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YueCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u yue cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">XiangCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u xiang cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Me</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"eating......"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">do</span><span class="params">(self, flavour)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> flavour == <span class="string">"cc"</span>:</span><br><span class="line">            cooker = ChuanCooker()</span><br><span class="line">        <span class="keyword">elif</span> flavour == <span class="string">"yc"</span>:</span><br><span class="line">            cooker = YueCooker()</span><br><span class="line">        <span class="keyword">elif</span> flavour == <span class="string">"xc"</span>:</span><br><span class="line">            cooker = XiangCooker()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">raise</span> <span class="string">"undefine flavour"</span></span><br><span class="line">        cooker.cook()</span><br><span class="line">        self.eat()</span><br></pre></td></tr></table></figure>
+<p>这样看起来好多了。每次吃饭前我只需要想好要吃什么，再由我的口味去挑选相应的厨师就行了。可是我好像对于挑选厨师也不是很在行，干脆这件事情也交给其他人算了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseCooker</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wash</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"xi cai"</span>)</span><br><span class="line"></span><br><span class="line">    ......共性方法</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">raise</span> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChuanCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u chuan cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YueCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u yue cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">XiangCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u xiang cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Restaurant</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">pickCooker</span><span class="params">(flavour)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> flavour == <span class="string">"cc"</span>:</span><br><span class="line">            cooker = ChuanCooker()</span><br><span class="line">        <span class="keyword">elif</span> flavour == <span class="string">"yc"</span>:</span><br><span class="line">            cooker = YueCooker()</span><br><span class="line">        <span class="keyword">elif</span> flavour == <span class="string">"xc"</span>:</span><br><span class="line">            cooker = XiangCooker()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">raise</span> <span class="string">"undefine flavour"</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> cooker</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Me</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"eating......"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">do</span><span class="params">(self, flavour)</span>:</span></span><br><span class="line">        cooker = Restaurant.pickCooker(flavour)</span><br><span class="line">        cooker.cook()</span><br><span class="line">        self.eat()</span><br></pre></td></tr></table></figure>
+<p>OK，我们终于将多余的事情都甩出去了，剩下的就是想好每天吃什么，然后我们告诉餐厅我们的口味，至于挑选哪个厨子的事情，这不是我们吃饭的人应该操心的。</p>
+<h3 id="角色对应"><a href="#角色对应" class="headerlink" title="角色对应"></a>角色对应</h3><p>到此为止，我们就算实现了简单工厂模式。简单工厂模式的实现需要三个角色：</p>
+<ul>
+<li>工厂类角色：这是简单工厂模式的核心角色。含有与应用紧密相关的业务逻辑，工厂类在客户端的调用下，根据传入参数不同，返回不同的产品对象。<blockquote>
+<p>在这个例子中，<strong>餐厅Restaurant对应着工厂类角色</strong></p>
+</blockquote>
+</li>
+<li>抽象产品角色：这个角色一般是产品的基类，或者说是父类。一般来说，这个类都是个抽象类。抽象是一个很抽象的概念，为了便于理解，我们在这个地方暂且不管吧。<blockquote>
+<p>在这个例子中， <strong>厨师基类BaseCooker对应着从抽象产品角色</strong></p>
+</blockquote>
+</li>
+<li>具体产品角色：这应该是最好理解的一个角色，就是工厂类实例化的对象，不管是哪个类实例化的，都是具体产品角色。<blockquote>
+<p>在这个例子中， <strong>在餐厅中实现的各种厨师对象，就是具体产品角色</strong></p>
+</blockquote>
+</li>
+</ul>
+<h3 id="优缺点分析"><a href="#优缺点分析" class="headerlink" title="优缺点分析"></a>优缺点分析</h3><ul>
+<li>优点：<ul>
+<li>将判断逻辑移植到工厂类中，从而免除了客户端对于生产对象的职责，实现责任分离：即客户端消费产品，工厂根据客户需求生产产品。</li>
+<li>对于客户端而言，无需知道到底能不能实现该产品，只需要知道产品的参数，能不能实现，怎么实现交给工厂。</li>
+<li>如果后期添加产品种类，修改的是工厂类的代码，而客户端的代码完全不需要改动。单从产品的角度来说，符合设计原则中的开放封闭原则。</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>工厂类与整个代码而言，是强耦合的，由于所有的产品对象都是工厂类完成的，一段工厂类发生异常，整个业务逻辑都会受到波及。</li>
+<li>一旦产品种类增加的很多，对于工厂类而言，判断逻辑过多，整个代码会显得很臃肿，不利于代码的后续扩展和维护。</li>
+</ul>
+</li>
+</ul>
+<h2 id="工厂方法模式"><a href="#工厂方法模式" class="headerlink" title="工厂方法模式"></a>工厂方法模式</h2><p>在工厂方法模式中，不再有单一的工厂生产产品。会将工厂类也抽象出来。工厂父类负责定义创建产品对象的公共接口，而工厂子类则负责生成具体的产品对象，这样做的目的是将产品类的实例化操作延迟到工厂子类中完成，即通过工厂子类来确定究竟应该实例化哪一个具体产品类。</p>
+<h3 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h3><p>故事线继续发展。</p>
+<p>在上一段故事中，我们吃饭的人貌似爽了，不爽的是餐馆了。随着我们的口味越来越奇怪，他们不得不招各种各样的厨子来满足我们（厨子的类要一直添加）。每次增加厨子菜单都要改写（添加elif判断）。终于有一天，餐馆忙中出错，菜单写错了，客人要的是闽菜MC，餐馆却让做徽菜WC的厨子上菜了。客人受不了被辣死了，餐馆被查封，这下所有的食客都吃不了饭了。</p>
+<p>有没有什么办法能够既满足众人的口味，又减轻餐馆的负担？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseCooker</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wash</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"xi cai"</span>)</span><br><span class="line"></span><br><span class="line">    ......共性方法</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">raise</span> </span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseRestaurant</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">receiptOfPayment</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"get customer cash!"</span>)</span><br><span class="line"></span><br><span class="line">    ......共性方法</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getCooker</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">raise</span> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChuanCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u chuan cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YueCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u yue cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">XiangCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u xiang cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChuanRestaurant</span><span class="params">(BaseRestaurant)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getCooker</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> ChuanCooker()</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YueRestaurant</span><span class="params">(BaseRestaurant)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getCooker</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> YueCooker()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">XiangRestaurant</span><span class="params">(BaseRestaurant)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getCooker</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> XiangCooker()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Me</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"eating......"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">do</span><span class="params">(self, restaurantName)</span>:</span></span><br><span class="line">        cooker = eval(restaurantName)().getCooker()</span><br><span class="line">        cooker.cook()</span><br><span class="line">        self.eat()</span><br></pre></td></tr></table></figure>
+<p>群众的力量是强大的，在大家的集思广益下，终于相处了一个好的办法：做特色菜馆！粤菜馆专门做粤菜，川菜馆专门做川菜，湘菜馆专门做湘菜……这样一来，虽然食客的口味是多样的，但是由于一家菜馆只做一种口味的菜。当用户口味再增加的时候，只需要在建立一个菜馆，菜馆里在招一个厨师就行了，之前的菜馆根本不用动。这样就算其中一个菜馆倒闭了，但是不影响其它口味的食客正常就餐！</p>
+<p>而作为食客，我只需要知道餐馆的名字就行了。食客需要做的事情，找到适合自己口味的餐馆，吃饭。</p>
+<blockquote>
+<p>备注：为了减少代码示例量，所以在restaurant的getCooker方法就是简单的生成对象。而在实际中，不是简简单单的这一行代码就，可能会有给厨师配置各种各样的厨具对象等等。</p>
+</blockquote>
+<h3 id="角色对应-1"><a href="#角色对应-1" class="headerlink" title="角色对应"></a>角色对应</h3><p>在工厂方法模式中，比简单工厂多了一种角色，或者更确切的说法是，将简单工厂模式中的工厂类角色拆分，拆分成为抽象工厂类和具体工厂类：</p>
+<ul>
+<li>抽象工厂类角色：这是工厂方法模式的核心角色。和业务逻辑无关。<blockquote>
+<p>在这个例子中，<strong>餐厅基类BaseRestaurant对应着抽象工厂类角色</strong></p>
+</blockquote>
+</li>
+<li>具体工厂类角色：担任这个角色的是实现了抽象工厂接口的类。具体工厂角色含有与应用密切相关的逻辑，并且受到应用程序的调用以创建产品对象。<blockquote>
+<p>在这个例子中， <strong>餐厅的实现，对应具体工厂类角色</strong></p>
+</blockquote>
+</li>
+<li>抽象产品角色：和简单工厂模式一样。<blockquote>
+<p>在这个例子中， <strong>厨师基类BaseCooker对应着从抽象产品角色</strong></p>
+</blockquote>
+</li>
+<li>具体产品角色：和简单工厂模式一样。<blockquote>
+<p>在这个例子中， <strong>在餐厅中实现的各种厨师对象，就是具体产品角色</strong></p>
+</blockquote>
+<h3 id="优缺点分析-1"><a href="#优缺点分析-1" class="headerlink" title="优缺点分析"></a>优缺点分析</h3></li>
+<li>优点：<ul>
+<li>在系统中加入新产品时，无须修改抽象工厂和抽象产品提供的接口，无须修改客户端，也无须修改其他的具体工厂和具体产品，而只要添加一个具体工厂和具体产品就可以了。这样，系统的可扩展性也就变得非常好，完全符合“开闭原则”。</li>
+<li>基于工厂角色和产品角色的多态性设计是工厂方法模式的关键。它能够使工厂可以自主确定创建何种产品对象，而如何创建这个对象的细节则完全封装在具体工厂内部。工厂方法模</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>现在一旦增加产品，要同时实现具体产品类和具体工厂类，系统复杂度直线上升。</li>
+</ul>
+</li>
+</ul>
+<h2 id="抽象工厂模式"><a href="#抽象工厂模式" class="headerlink" title="抽象工厂模式"></a>抽象工厂模式</h2><p>抽象工厂模式是对工厂方法模式的进一步演化。其定义是：提供一个创建<strong>一系列相关或相互依赖对象</strong>的接口，而无须指定它们具体的类。在前面的简单工厂模式和工厂方法模式中，我们都是对一个对象的获取，而在抽象工厂模式中，变成了一系列相关的对象。</p>
+<p>这里面有两个关键词，一个是<strong>系列</strong>一个是<strong>相互依赖</strong>。简单来说，抽象工厂模式能提供一堆对象，这一堆对象之间是有相互关系的。我们举个例子说明</p>
+<p>在前面的代码演示中，我们通过工厂方法模式，演变出了食客找餐馆，餐馆负责招厨师，厨师生产食物的过程，其实吃饭不是一件独立能完成的事情，还需要很多很多的辅助。比如说我们把食物放到嘴里，是需要餐具的，而每个地方菜的餐具都是有其特色的。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseCooker</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wash</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"xi cai"</span>)</span><br><span class="line"></span><br><span class="line">    ......共性方法</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">raise</span> </span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseRestaurant</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">receiptOfPayment</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"get customer cash!"</span>)</span><br><span class="line"></span><br><span class="line">    ......共性方法</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getCooker</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">raise</span> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChuanCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u chuan cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YueCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u yue cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">XiangCooker</span><span class="params">(BaseCooker)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cook</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"gei u xiang cai"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseTableware</span><span class="params">(object)</span>:</span></span><br><span class="line">    ......共性方法</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">takeFood</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">raise</span> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChuanTableware</span><span class="params">(BaseTableware)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">takeFood</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"take chuan food"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YueTableware</span><span class="params">(BaseTableware)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">takeFood</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"take yue food"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">XiangTableware</span><span class="params">(BaseTableware)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">takeFood</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"take xiang food"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChuanRestaurant</span><span class="params">(BaseRestaurant)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getCooker</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> ChuanCooker()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getTableware</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> ChuanTableware()</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YueRestaurant</span><span class="params">(BaseRestaurant)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getCooker</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> YueCooker()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getTableware</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> YueTableware()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">XiangRestaurant</span><span class="params">(BaseRestaurant)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getCooker</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> XiangCooker()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getTableware</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> XiangTableware()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Me</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">eat</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"eating......"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">do</span><span class="params">(self, restaurantName)</span>:</span></span><br><span class="line">        cur = eval(restaurantName)()</span><br><span class="line"></span><br><span class="line">        cooker = cur.getCooker()</span><br><span class="line">        tableware = cur.getTableware()</span><br><span class="line"></span><br><span class="line">        cooker.cook()</span><br><span class="line">        self.eat()</span><br></pre></td></tr></table></figure>
+<p>在上述实现中，我们将各种菜系的餐具和这个菜系绑定在了一起，而厨师和餐具之间是有联系的，我们通过不同的工厂对象，获取了一系列相关联的对象集合。</p>
+<h3 id="角色对应-2"><a href="#角色对应-2" class="headerlink" title="角色对应"></a>角色对应</h3><p>抽象工厂模式与工厂方法模式的角色基本相同。唯一不同之处在于，具体产品角色不再是由一个具体对象担任，而是由一系列的对象。由具体工厂产出的对象都可以称之为具体产品对象</p>
+<h3 id="优缺点分析-2"><a href="#优缺点分析-2" class="headerlink" title="优缺点分析"></a>优缺点分析</h3><ul>
+<li><p>优点</p>
+<ul>
+<li><p>抽象工厂模式隔离了具体类的生成，使得客户并不需要知道什么被创建。由于这种隔离，更换一个具体工厂就变得相对容易。所有的具体工厂都实现了抽象工厂中定义的那些公共接口，因此只需改变具体工厂的实例，就可以在某种程度上改变整个软件系统的行为。另外，应用抽象工厂模式可以实现高内聚低耦合的设计目的，因此抽象工厂模式得到了广泛的应用。<br>当一个产品族中的多个对象被设计成一起工作时，它能够保证客户端始终只使用同一个产品族中的对象。这对一些需要根据当前环境来决定其行为的软件系统来说，是一种非常实用的设计模式。</p>
+</li>
+<li><p>增加新的具体工厂和产品族很方便，无须修改已有系统，符合“开闭原则”。</p>
+</li>
+</ul>
+</li>
+<li><p>缺点</p>
+<ul>
+<li><p>在添加新的产品对象时，难以扩展抽象工厂来生产新种类的产品，这是因为在抽象工厂角色中规定了所有可能被创建的产品集合，要支持新种类的产品就意味着要对该接口进行扩展，而这将涉及到对抽象工厂角色及其所有子类的修改，显然会带来较大的不便。</p>
+</li>
+<li><p>开闭原则的倾斜性（增加新的工厂和产品族容易，增加新的产品等级结构麻烦）。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>我们借用一个故事来说明了工厂模式的演化和进阶，但是对于工厂模式而言，需要根据场景的不同而去选择最合适的一种，不一定一味的追求最复杂的。最好的软件设计不是具有多复杂的系统设计，而是在满足需求的情况下，尽可能的降低系统的复杂度。</p>
+<p>工厂模式也是会有退化的。当抽象工厂模式中每一个具体工厂类只创建一个产品对象，也就是只存在一个产品等级结构时，抽象工厂模式退化成工厂方法模式；当工厂方法模式中抽象工厂与具体工厂合并，提供一个统一的工厂来创建产品对象，并将创建对象的工厂方法设计为静态方法时，工厂方法模式退化成简单工厂模式。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/pay/wechat.jpg" alt="linjiechuang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/pay/ali.jpg" alt="linjiechuang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/04/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F%E7%95%AA%E5%A4%96%E7%AF%87%E5%85%83%E7%B1%BB/" rel="next" title="单例模式之元类">
+                <i class="fa fa-chevron-left"></i> 单例模式之元类
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/10/%E6%8A%BD%E8%B1%A1/" rel="prev" title="工厂模式之抽象">
+                工厂模式之抽象 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.jpg"
+                alt="linjiechuang" />
+            
+              <p class="site-author-name" itemprop="name">linjiechuang</p>
+              <p class="site-description motion-element" itemprop="description">但行好事莫问前程 兼程行路勿忘初心</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/NicolasCricle" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:17625905485@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#设计模式之工厂"><span class="nav-number">1.</span> <span class="nav-text">设计模式之工厂</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">2.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简单的工厂模式"><span class="nav-number">3.</span> <span class="nav-text">简单的工厂模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例"><span class="nav-number">3.1.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#角色对应"><span class="nav-number">3.2.</span> <span class="nav-text">角色对应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优缺点分析"><span class="nav-number">3.3.</span> <span class="nav-text">优缺点分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工厂方法模式"><span class="nav-number">4.</span> <span class="nav-text">工厂方法模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-1"><span class="nav-number">4.1.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#角色对应-1"><span class="nav-number">4.2.</span> <span class="nav-text">角色对应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优缺点分析-1"><span class="nav-number">4.3.</span> <span class="nav-text">优缺点分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抽象工厂模式"><span class="nav-number">5.</span> <span class="nav-text">抽象工厂模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#角色对应-2"><span class="nav-number">5.1.</span> <span class="nav-text">角色对应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优缺点分析-2"><span class="nav-number">5.2.</span> <span class="nav-text">优缺点分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">linjiechuang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'h8QUIA5X9IkaSOPQT7xHEIPv-gzGzoHsz',
+        appKey: 'iYjdtrqeOsaEqgrfb20TOLE0',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

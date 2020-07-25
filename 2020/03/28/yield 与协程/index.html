@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,协程,yield," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="进程、线程与协程一般来说，进程是操作系统分配资源的最小单元；线程是操作系统进行调度的最小单元。而协程则相对不同，协程也拥有自己的独立的上下文，并且协程的切换由自己来控制。与线程相比，协程避免了无意义的调度，此方面可以提升一定的性能。同时，由于需要程序自身完成调度，协程也失去了标准线程使用多CPU的能力。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="yield与协程">
+<meta property="og:url" content="http://yoursite.com/2020/03/28/yield%20%E4%B8%8E%E5%8D%8F%E7%A8%8B/index.html">
+<meta property="og:site_name" content="linjiechuang">
+<meta property="og:description" content="进程、线程与协程一般来说，进程是操作系统分配资源的最小单元；线程是操作系统进行调度的最小单元。而协程则相对不同，协程也拥有自己的独立的上下文，并且协程的切换由自己来控制。与线程相比，协程避免了无意义的调度，此方面可以提升一定的性能。同时，由于需要程序自身完成调度，协程也失去了标准线程使用多CPU的能力。">
+<meta property="article:published_time" content="2020-03-27T20:15:22.000Z">
+<meta property="article:modified_time" content="2020-07-25T11:42:21.229Z">
+<meta property="article:author" content="linjiechuang">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="协程">
+<meta property="article:tag" content="yield">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/03/28/yield 与协程/"/>
+
+
+
+
+
+  <title>yield与协程 | linjiechuang</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f84ed9e2d0812fc306a7a6d239c0a25a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">linjiechuang</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/28/yield%20%E4%B8%8E%E5%8D%8F%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="linjiechuang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="linjiechuang">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">yield与协程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-28T04:15:22+08:00">
+                2020-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/03/28/yield%20%E4%B8%8E%E5%8D%8F%E7%A8%8B/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/03/28/yield%20%E4%B8%8E%E5%8D%8F%E7%A8%8B/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="进程、线程与协程"><a href="#进程、线程与协程" class="headerlink" title="进程、线程与协程"></a>进程、线程与协程</h2><p>一般来说，进程是操作系统分配资源的最小单元；线程是操作系统进行调度的最小单元。而协程则相对不同，协程也拥有自己的独立的上下文，并且协程的切换由自己来控制。<br>与线程相比，协程避免了无意义的调度，此方面可以提升一定的性能。同时，由于需要程序自身完成调度，协程也失去了标准线程使用多CPU的能力。</p>
+<a id="more"></a>
+<h2 id="Python的生成器函数与协程"><a href="#Python的生成器函数与协程" class="headerlink" title="Python的生成器函数与协程"></a>Python的生成器函数与协程</h2><p>在Python中，含有yield关键字的函数被称之为生成器函数。<br>在Python2.5之后，对生成器函数实现了.send()方法。该方法与__next__类似，可以使得生成器前进到下一个yield点，同时，.send()函数还允许调度方将数据作为参数返还给自身。也就是说，.send()方法允许调度方与生成器之间双向交换数据。<br>这种改进极大的改变了生成器的本质。如果像是这样使用的话，生成器本省就变成了协程。但是，生成器和协程从使用角度来说，还是有不同之处的：</p>
+<ul>
+<li>生成器用于生成供以迭代的数据，是产生数据的一方，并不需要额外的从调度方回收数据。</li>
+<li>协程则是数据的消费者，一般来说，是由调度方将数据传递到协程供协程加工。</li>
+<li>协程是与迭代无关的。</li>
+</ul>
+<p>yield关键字可以不接受和传出数据，但是不管数据是如何流动的，yield都只是一种控制流程的工具。从根本上把yield视作是控制流程的方式，这样可能更加有利于理解协程。<br>协程指的是一个过程，这个过程与调度方协作，产出由调度方提供的值。</p>
+<h2 id="基本的协程"><a href="#基本的协程" class="headerlink" title="基本的协程"></a>基本的协程</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">simple_coroutine</span><span class="params">()</span>:</span></span><br><span class="line">	print(<span class="string">"coroutine start!"</span>)</span><br><span class="line">	data = <span class="keyword">yield</span> <span class="number">10</span></span><br><span class="line">	print(<span class="string">"received data &#123;&#125;"</span>.format(data))</span><br><span class="line"></span><br><span class="line">cor = simple_coroutine()                        <span class="comment"># 创建一个协程</span></span><br><span class="line">d = next(cor)                                   <span class="comment"># 催动协程到第一个yield控制点</span></span><br><span class="line">print(d)                                        <span class="comment"># 接受由yield返还的数据</span></span><br><span class="line">cor.send(<span class="number">100</span>)                                   <span class="comment"># 接下来由send函数驱动协程到下一个yield控制点，同时将参数传递到协程，由于没有yield，会抛出StopIteration异常</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">coroutine start!</span></span><br><span class="line"><span class="string">10</span></span><br><span class="line"><span class="string">received data 100</span></span><br><span class="line"><span class="string">Traceback (most recent call last):</span></span><br><span class="line"><span class="string">  File "/Users/livis/Desktop/notes/format_demo.py", line 77, in &lt;module&gt;</span></span><br><span class="line"><span class="string">    cor.send(100)                                   # 接下来由send函数驱动协程到下一个yield控制点，同时将参数传递到协程，由于没有yield，会抛出StopIteration异常</span></span><br><span class="line"><span class="string">StopIteration</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+
+<p>如果协程处于等待开始执行的状态，则不能使用send。<br>协程大致可以分为四个状态，协程的当前状态可以由inspect模块中的getgeneratorstate()函数来获取，参数是协程变量，返还下述字符串中的一个：</p>
+<ul>
+<li>GEN_CREATED——协程被创建，但尚未开始。表示协程处于等待开始执行。</li>
+<li>GEN_RUNNING——协程正在被执行。    </li>
+<li>GEN_SUSPENDED——协程在yield表达式处暂停。</li>
+<li>GEN_CLOSED——协程已被关闭，执行结束。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">average</span><span class="params">()</span>:</span></span><br><span class="line">	total = <span class="number">0</span></span><br><span class="line">	count = <span class="number">0</span></span><br><span class="line">	average = <span class="number">0</span></span><br><span class="line">	<span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">		data = <span class="keyword">yield</span> average</span><br><span class="line">		total += data</span><br><span class="line">		count += <span class="number">1</span></span><br><span class="line">		average = total / count</span><br><span class="line">		</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ave.send(<span class="number">3</span>)					<span class="comment"># 没有激活的协程直接使用send()会抛出异常。</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">TypeError: can<span class="string">'t send non-None value to a just-started generator</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; ave = average()				# 获取协程对象</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; next(ave)					# 激活协程</span></span><br><span class="line"><span class="string">&gt;&gt;&gt;	ave.send(10)					# 求取第一次平均值</span></span><br><span class="line"><span class="string">10.0</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; ave.send(20)				# 求取第二次平均值</span></span><br><span class="line"><span class="string">15.0</span></span><br><span class="line"><span class="string">&gt;&gt;&gt; ave.send(3)					# 求取第三次平均值</span></span><br><span class="line"><span class="string">11.0</span></span><br></pre></td></tr></table></figure>
+<p>上述例子展示了如何使用协程来计算一个动态的平均值。在协程没有被next函数激活的情况下，直接使用send函数会报错。</p>
+<h3 id="协程的终止以及异常处理"><a href="#协程的终止以及异常处理" class="headerlink" title="协程的终止以及异常处理"></a>协程的终止以及异常处理</h3><p>协程中未处理的异常会导致协程终止。传递给协程的调度方。而调度方也可以显示的将异常发送给协程，这两个方法是throw和close。</p>
+<ul>
+<li>throw方法会导致生成器在暂停的yield表达式处抛出指定的异常，如果生成器处理了相关的异常，则代码继续执行到下一个yield，此时的yield的返回值会作为调用throw()方法的接受值。如果无法处理相关异常，则异常会向上冒泡，回到调用方的上下文中。</li>
+<li>close方法会在生成器内部暂停的yield处抛出指定的GeneratorExit异常，如果生成器没有处理，或者是生成器抛出了StopIteration，协程的调度方不会报错，而是直接终止。然后如果说生成器处理了该异常，那么就一定不能有返回值，否则会抛出RuntimeError异常。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">MyException</span><span class="params">(Exception)</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">pass</span></span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">gene</span><span class="params">()</span>:</span></span><br><span class="line"><span class="meta">... </span>    index = <span class="number">1</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">while</span> index:</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">try</span>:</span><br><span class="line"><span class="meta">... </span>            <span class="keyword">yield</span> <span class="string">"&#123;&#125;data"</span>.format(index)</span><br><span class="line"><span class="meta">... </span>            print(<span class="string">'&#123;&#125;ok'</span>.format(index))</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">except</span> MyException:</span><br><span class="line"><span class="meta">... </span>            print(<span class="string">"get my exception!"</span>)</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line"><span class="meta">... </span>            <span class="keyword">raise</span> e</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">finally</span>:</span><br><span class="line"><span class="meta">... </span>            index += <span class="number">1</span></span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g = gene()						<span class="comment"># 创建协程对象</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g)							<span class="comment"># 激活协程</span></span><br><span class="line"><span class="string">'1data'</span>								<span class="comment"># 激活协程时候第一次返回的数据</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g.throw(MyException())			<span class="comment"># 通过throw传递MyException进入协程内部</span></span><br><span class="line">get my exception!					<span class="comment"># 被第一个Except子语句捕获</span></span><br><span class="line"><span class="string">'2data'</span>								<span class="comment"># 协程内部处理之后接着走到第二个yield地方</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g)							<span class="comment"># 传递的错误如果被协程内部处理，则不影响协程运行</span></span><br><span class="line"><span class="number">2</span>ok	</span><br><span class="line"><span class="string">'3data'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g.throw(Exception())				<span class="comment"># 抛入一个不被处理的错误类型</span></span><br><span class="line">Traceback (most recent call last):		<span class="comment"># 引发错误栈</span></span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">10</span>, <span class="keyword">in</span> gene</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">5</span>, <span class="keyword">in</span> gene</span><br><span class="line">Exception</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g)							<span class="comment"># 协程已经被终止</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">StopIteration</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g2 = gene()						<span class="comment"># 再次创建个新的协程对象并激活</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g2)</span><br><span class="line"><span class="string">'1data'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g2.close()						<span class="comment"># 使用close关闭协程</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g2)							<span class="comment"># 关闭后的协程已经被终止</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">StopIteration</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="协程通过return返回值"><a href="#协程通过return返回值" class="headerlink" title="协程通过return返回值"></a>协程通过return返回值</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">gene</span><span class="params">()</span>:</span>							</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">yield</span> <span class="string">"this is yield！"</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">return</span> <span class="string">"this is return！"</span></span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g = gene()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g)</span><br><span class="line"><span class="string">'this is yield!'</span>								<span class="comment"># 第一次调用，生成器输出的是yield后面的内容</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g)</span><br><span class="line">Traceback (most recent call last):				<span class="comment"># 再次启动生成器，抛出StopIteration异常，注意异常的内容说明，与return的一样。</span></span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">StopIteration: this <span class="keyword">is</span> <span class="keyword">return</span>!</span><br></pre></td></tr></table></figure>
+<p>通过上述例子可以来看出，return返还的内容像是被StopIteration接受了。下面尝试使用try/exxcept来捕捉异常并输出。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">MyObject</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">pass</span></span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">gene</span><span class="params">()</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">yield</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">return</span> MyObject()</span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g = gene()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">try</span>:</span><br><span class="line"><span class="meta">... </span>    next(g)</span><br><span class="line"><span class="meta">... </span><span class="keyword">except</span> StopIteration <span class="keyword">as</span> e:</span><br><span class="line"><span class="meta">... </span>    res = e.value</span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>res</span><br><span class="line">&lt;__main__.MyObject object at <span class="number">0x101155da0</span>&gt;</span><br></pre></td></tr></table></figure>
+<p>协程的返回值被StopIteration的value所保存。</p>
+<h2 id="yield-from"><a href="#yield-from" class="headerlink" title="yield from"></a>yield from</h2><p>yield from 是一种全新的语言结构，它的作用会比yield多很多。<br>在其他的育秧中，类似的结构使用await关键字比较多。这个名称比较容易理解，因为它传递了至关重要的一点，在生成器gen中使用yield from subgen()的时候，subgen()会获取程序的控制权，把产出的值传给gen的调度方。<br>也就是说调度方可以直接控制subgen()，与此同时，gen会阻塞等待，等待subgen的终止。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">gen</span><span class="params">()</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="string">"abc"</span>:</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">yield</span> i</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">yield</span> j</span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(gen())</span><br><span class="line">[<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">gen2</span><span class="params">()</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">yield</span> <span class="keyword">from</span> <span class="string">"abc"</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">yield</span> <span class="keyword">from</span> range(<span class="number">3</span>)</span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(gen2())</span><br><span class="line">[<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>上例子表示使用yield可以简化for循环中的yield表达式。<br>除此之外，在说明标准库生成器函数的时候，又一个chain函数，作用是为元素为可迭代对象的可迭代对象拆包，可以写成下面的形式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">chain</span><span class="params">(*iterators)</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">for</span> it <span class="keyword">in</span> iterators:</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">yield</span> <span class="keyword">from</span> it</span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> chain(<span class="string">"abc"</span>, range(<span class="number">3</span>)):</span><br><span class="line"><span class="meta">... </span>    print(i)</span><br><span class="line"><span class="meta">... </span></span><br><span class="line">a</span><br><span class="line">b</span><br><span class="line">c</span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关于yield-from-表达式的一些说明"><a href="#关于yield-from-表达式的一些说明" class="headerlink" title="关于yield from 表达式的一些说明"></a>关于yield from 表达式的一些说明</h3><p>对于 <strong>yield from x</strong> 表达式，对对象x所做的第一个操作是取出对象x的迭代器，即iter(x)。<br>下面将就一个例子详细说明yield from 对程序流程控制的影响，为了方便说明，首先解释一些术语：</p>
+<ul>
+<li>委派生成器    包含有yield from 表达式的生成器函数</li>
+<li>子生成器    被yield from 表达式获取的生成器函数</li>
+<li>调度方    调用委派生成器的程序代码</li>
+</ul>
+<blockquote>
+<p>委派生成器在yield from 表达式处暂停后，调用方可以直接把数据发送到子生成器，而委派生成器并不知道数据。子生成器再将产出的值返回到调用方，委派方也不知道，当子生成器完全返回（被return）的时候，解释器抛出StopIteration异常，并将返回值附加到异常的value属性上。然后委派生成器再次开始运行。<br>委派生成器更像是一个调度方与子生成器交互数据的管道。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">subgen</span><span class="params">()</span>:</span></span><br><span class="line"><span class="meta">... </span>    flag = <span class="number">1</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">while</span> flag:</span><br><span class="line"><span class="meta">... </span>        print(<span class="string">"子生成器被执行-----&#123;&#125;"</span>.format(flag))</span><br><span class="line"><span class="meta">... </span>        flag = <span class="keyword">yield</span> <span class="number">123</span></span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">gen</span><span class="params">()</span>:</span></span><br><span class="line"><span class="meta">... </span>    flagMax = <span class="number">1</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">while</span> flagMax:</span><br><span class="line"><span class="meta">... </span>        print(<span class="string">"委派生成器被执行"</span>)</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">yield</span> <span class="keyword">from</span> subgen()</span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g = gen()			</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g)</span><br><span class="line">委派生成器被执行</span><br><span class="line">子生成器被执行----<span class="number">-1</span></span><br><span class="line"><span class="number">123</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(g)</span><br><span class="line">委派生成器被执行</span><br><span class="line">子生成器被执行----<span class="number">-1</span></span><br><span class="line"><span class="number">123</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g.send(<span class="number">10</span>)</span><br><span class="line">子生成器被执行----<span class="number">-10</span></span><br><span class="line"><span class="number">123</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g.send(<span class="number">100</span>)</span><br><span class="line">子生成器被执行----<span class="number">-100</span></span><br><span class="line"><span class="number">123</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>g.send(<span class="number">0</span>)</span><br><span class="line">委派生成器被执行</span><br><span class="line">子生成器被执行----<span class="number">-1</span></span><br><span class="line"><span class="number">123</span></span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
+<p>首先定义类两个生成器，其中有一个是有yield from 结构的生成器，暂称之为委派生成器，另一个称之为子生成器。<br>第一步首先创建委派生成器对象，并将其激活。在这一步中可以看到委派生成器和子生成器的代码都执行了。<br>当再次使用next的时候，相当于执行委派生成器，重新创建了子生成器对象。 委派生成器代码和子生成器代码均执行。<br>但当使用send函数发生数据交互的时候，更像是调度方直接和子生成器进行了数据交互，委派生成器的代码像是没有执行。<br>通过send(0)，子生成器退出循环，返回None，同时抛出StopIteration异常，委派生成器再次开始运行，创建新的子生成器。</p>
+<h3 id="yield-from-举一个实例"><a href="#yield-from-举一个实例" class="headerlink" title="yield from 举一个实例"></a>yield from 举一个实例</h3><p>从一个字典中读取虚构的七年级男女学生的身高和体重，生成一个报告。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> namedtuple</span><br><span class="line"></span><br><span class="line">Result = namedtuple(<span class="string">'Result'</span>, <span class="string">'count average'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># the subgenerator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">averager</span><span class="params">()</span>:</span>  <span class="comment"># &lt;1&gt;</span></span><br><span class="line">    total = <span class="number">0.0</span></span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line">    average = <span class="literal">None</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        term = <span class="keyword">yield</span>  <span class="comment"># &lt;2&gt;</span></span><br><span class="line">        <span class="keyword">if</span> term <span class="keyword">is</span> <span class="literal">None</span>:  <span class="comment"># &lt;3&gt;</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        total += term</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">        average = total/count</span><br><span class="line">    <span class="keyword">return</span> Result(count, average)  <span class="comment"># &lt;4&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># the delegating generator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">grouper</span><span class="params">(results, key)</span>:</span>  <span class="comment"># &lt;5&gt;</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:  <span class="comment"># &lt;6&gt;</span></span><br><span class="line">        results[key] = <span class="keyword">yield</span> <span class="keyword">from</span> averager()  <span class="comment"># &lt;7&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># the client code, a.k.a. the caller</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(data)</span>:</span>  <span class="comment"># &lt;8&gt;</span></span><br><span class="line">    results = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> key, values <span class="keyword">in</span> data.items():</span><br><span class="line">        group = grouper(results, key)  <span class="comment"># &lt;9&gt;</span></span><br><span class="line">        next(group)  <span class="comment"># &lt;10&gt;</span></span><br><span class="line">        <span class="keyword">for</span> value <span class="keyword">in</span> values:</span><br><span class="line">            group.send(value)  <span class="comment"># &lt;11&gt;</span></span><br><span class="line">        group.send(<span class="literal">None</span>)  <span class="comment"># important! &lt;12&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># print(results)  # uncomment to debug</span></span><br><span class="line">    report(results)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># output report</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">report</span><span class="params">(results)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> key, result <span class="keyword">in</span> sorted(results.items()):</span><br><span class="line">        group, unit = key.split(<span class="string">';'</span>)</span><br><span class="line">        print(<span class="string">'&#123;:2&#125; &#123;:5&#125; averaging &#123;:.2f&#125;&#123;&#125;'</span>.format(</span><br><span class="line">              result.count, group, result.average, unit))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">data = &#123;</span><br><span class="line">    <span class="string">'girls;kg'</span>:</span><br><span class="line">        [<span class="number">40.9</span>, <span class="number">38.5</span>, <span class="number">44.3</span>, <span class="number">42.2</span>, <span class="number">45.2</span>, <span class="number">41.7</span>, <span class="number">44.5</span>, <span class="number">38.0</span>, <span class="number">40.6</span>, <span class="number">44.5</span>],</span><br><span class="line">    <span class="string">'girls;m'</span>:</span><br><span class="line">        [<span class="number">1.6</span>, <span class="number">1.51</span>, <span class="number">1.4</span>, <span class="number">1.3</span>, <span class="number">1.41</span>, <span class="number">1.39</span>, <span class="number">1.33</span>, <span class="number">1.46</span>, <span class="number">1.45</span>, <span class="number">1.43</span>],</span><br><span class="line">    <span class="string">'boys;kg'</span>:</span><br><span class="line">        [<span class="number">39.0</span>, <span class="number">40.8</span>, <span class="number">43.2</span>, <span class="number">40.8</span>, <span class="number">43.1</span>, <span class="number">38.6</span>, <span class="number">41.4</span>, <span class="number">40.6</span>, <span class="number">36.3</span>],</span><br><span class="line">    <span class="string">'boys;m'</span>:</span><br><span class="line">        [<span class="number">1.38</span>, <span class="number">1.5</span>, <span class="number">1.32</span>, <span class="number">1.25</span>, <span class="number">1.37</span>, <span class="number">1.48</span>, <span class="number">1.25</span>, <span class="number">1.49</span>, <span class="number">1.46</span>],</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main(data)</span><br></pre></td></tr></table></figure>
+<ol>
+<li>此生成器作为<strong>子生成器</strong>使用。</li>
+<li>调度方代码<strong>发送的值绑定到item变量</strong>。</li>
+<li>至关重要的终止条件，子生成器通过调度方发送的数据来跳出循环。如果不这么做，使用yield from的这个生成器将会永远阻塞。</li>
+<li>返还的结果将成为<strong>委托生成器函数中yield from 表达式的值</strong>。</li>
+<li>委派生成器。</li>
+<li>委派生成器中，循环每次迭代都换新建子生成器对象，每个对象都做协程使用。</li>
+<li>grouper发送的值都会经由yield from 传递到average对象处理，grouper会在yield from处暂停。当average运行结束返回值的时候，将值绑定到result上。然后再次迭代。</li>
+<li>调度方。</li>
+<li>获取生成器对象。</li>
+<li>预激生成器对象。</li>
+<li>将value传递到average，传递的值最终到term = yield 那一行。  </li>
+<li>将None传入average，导致average跳出循环，终止，染grouper继续运行，创建下一个average实例，处理下一组值。</li>
+</ol>
+<h2 id="使用协程做离散事件仿真"><a href="#使用协程做离散事件仿真" class="headerlink" title="使用协程做离散事件仿真"></a>使用协程做离散事件仿真</h2><blockquote>
+<p>离散事件仿真是一种把系统建模成一系列事件的仿真类型。<br>在离散事件中，时刻向前推进的量是不一定的，假想时间是一条轴，事件发生的时间是轴上的一个个时间节点。<br>只要逐步推进轴上的节点，就能在很短的时间内模拟很长时间的事件发生情况。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> queue</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> namedtuple</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建事件类，只需要有属性，所以namedtuple即可 一共有四种事件action，分别是leave garage；pick off，drop off; going home</span></span><br><span class="line">Event = namedtuple(<span class="string">"Event"</span>, [<span class="string">'time'</span>, <span class="string">'proc'</span>, <span class="string">'action'</span>])</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">taxi_process</span><span class="params">(taxiId, trips, startTime=<span class="number">0</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    用于产生出租车的各项事件</span></span><br><span class="line"><span class="string">    首先产生 leave garage 事件</span></span><br><span class="line"><span class="string">    程序挂起</span></span><br><span class="line"><span class="string">    时间轴推进的时候再次启动程序，同时传递参数time1</span></span><br><span class="line"><span class="string">    接下来循环接送乘客：</span></span><br><span class="line"><span class="string">        产生接乘客事件，暂停</span></span><br><span class="line"><span class="string">        激活 返回下乘客时间，返回下乘客事件，挂起</span></span><br><span class="line"><span class="string">        激活，返回接乘客时间， 返回接乘客时间， 挂起</span></span><br><span class="line"><span class="string">        ......</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    leaveTime标记离开时间</span></span><br><span class="line"><span class="string">    最后返回回家事件</span></span><br><span class="line"><span class="string">    然后抛出StopIteration</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    time1 = <span class="keyword">yield</span> Event(startTime, taxiId, <span class="string">'leave garage'</span>)</span><br><span class="line">    </span><br><span class="line">    leaveTime = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(trips):</span><br><span class="line">        time1 = <span class="keyword">yield</span> Event(time1, taxiId, <span class="string">'pick up passenger'</span>)</span><br><span class="line">        time1 = <span class="keyword">yield</span> Event(time1, taxiId, <span class="string">'drop off passenger'</span>)</span><br><span class="line"></span><br><span class="line">        leaveTime = time1</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">yield</span> Event(leaveTime, taxiId, <span class="string">'going home'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Simulator</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, procsMap)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        数据保存激活的协程映射 形如&#123;出租车ID：对应的事件生成器&#125;</span></span><br><span class="line"><span class="string">        queue.PriorityQueue 优先级队列，会为置入的元素排序（二叉树）</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        self._procsMap = dict(procsMap)</span><br><span class="line">        self._events = queue.PriorityQueue()</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self, endTime)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        执行函数, endTime为结束仿真模拟测试的时刻</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 将所有事件按键排序， 预激活协程，获取离开车库事件， 将事件加入队列</span></span><br><span class="line">        <span class="keyword">for</span> taxiId, process <span class="keyword">in</span> sorted(self._procsMap.items()):</span><br><span class="line">            leaveEven = next(process)</span><br><span class="line">            self._events.put(leaveEven)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 仿真事件主循环</span></span><br><span class="line">        simTime = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> simTime &lt; endTime:</span><br><span class="line">            <span class="comment"># 队列里面事件空了，结束循环</span></span><br><span class="line">            <span class="keyword">if</span> self._events.empty():</span><br><span class="line">                print(<span class="string">"---end events---"</span>)</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 获取队列里时刻最近的 出租车事件， 并对namedtuple拆包, 然后输出事件</span></span><br><span class="line">            curEvent = self._events.get()</span><br><span class="line">            simTime, procId, action = curEvent</span><br><span class="line">            print(<span class="string">'taxi:&#123;&#125;&#123;&#125;'</span>.format(procId, procId*<span class="string">'\t'</span>), curEvent)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 从映射中获取当前激活的协程</span></span><br><span class="line">            activeProc = self._procsMap.get(procId)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 获取下一次的时刻</span></span><br><span class="line">            nextTime = simTime + compute_duration(action)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 驱动响应的协程</span></span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                event = activeProc.send(nextTime)</span><br><span class="line">            <span class="keyword">except</span> StopIteration:</span><br><span class="line">                <span class="keyword">del</span> self._procsMap[procId]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                self._events.put(event)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 到了截止时间 队列尚有事件尚未输出</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">'---end of simulator time, &#123;&#125; events pending!'</span>.format(self._events.qsize()))</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">compute_duration</span><span class="params">(action)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> action <span class="keyword">in</span> [<span class="string">'leave garage'</span>, <span class="string">'drop off passenger'</span>]:</span><br><span class="line">        <span class="comment"># new state is prowling</span></span><br><span class="line">        interval = <span class="number">5</span></span><br><span class="line">    <span class="keyword">elif</span> action == <span class="string">'pick up passenger'</span>:</span><br><span class="line">        <span class="comment"># new state is trip</span></span><br><span class="line">        interval = <span class="number">20</span></span><br><span class="line">    <span class="keyword">elif</span> action == <span class="string">'going home'</span>:</span><br><span class="line">        interval = <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">raise</span> ValueError(<span class="string">'Unknown previous_action: %s'</span> % action)</span><br><span class="line">    <span class="keyword">return</span> int(random.expovariate(<span class="number">1</span>/interval)) + <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(endTime)</span>:</span></span><br><span class="line">    taxis = &#123;</span><br><span class="line">        _id: taxi_process(_id, (_id+<span class="number">1</span>)*<span class="number">2</span>, _id*<span class="number">5</span>) <span class="keyword">for</span> _id <span class="keyword">in</span> range(<span class="number">3</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    s = Simulator(taxis)</span><br><span class="line">    s.run(endTime)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    main(<span class="number">150</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="新的关键字"><a href="#新的关键字" class="headerlink" title="新的关键字"></a>新的关键字</h2><p>Python 3.5以后，出现了新的关键子，async/await</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/pay/wechat.jpg" alt="linjiechuang 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/pay/ali.jpg" alt="linjiechuang 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/%E5%8D%8F%E7%A8%8B/" rel="tag"># 协程</a>
+          
+            <a href="/tags/yield/" rel="tag"># yield</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/17/Python%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/" rel="next" title="Python 上下文管理">
+                <i class="fa fa-chevron-left"></i> Python 上下文管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/11/%E4%BD%BF%E7%94%A8future%E5%A4%84%E7%90%86%E5%B9%B6%E5%8F%91/" rel="prev" title="使用future处理并发">
+                使用future处理并发 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.jpg"
+                alt="linjiechuang" />
+            
+              <p class="site-author-name" itemprop="name">linjiechuang</p>
+              <p class="site-description motion-element" itemprop="description">但行好事莫问前程 兼程行路勿忘初心</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/NicolasCricle" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:17625905485@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#进程、线程与协程"><span class="nav-number">1.</span> <span class="nav-text">进程、线程与协程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python的生成器函数与协程"><span class="nav-number">2.</span> <span class="nav-text">Python的生成器函数与协程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本的协程"><span class="nav-number">3.</span> <span class="nav-text">基本的协程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#协程的终止以及异常处理"><span class="nav-number">3.1.</span> <span class="nav-text">协程的终止以及异常处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协程通过return返回值"><span class="nav-number">3.2.</span> <span class="nav-text">协程通过return返回值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#yield-from"><span class="nav-number">4.</span> <span class="nav-text">yield from</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#关于yield-from-表达式的一些说明"><span class="nav-number">4.1.</span> <span class="nav-text">关于yield from 表达式的一些说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yield-from-举一个实例"><span class="nav-number">4.2.</span> <span class="nav-text">yield from 举一个实例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用协程做离散事件仿真"><span class="nav-number">5.</span> <span class="nav-text">使用协程做离散事件仿真</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新的关键字"><span class="nav-number">6.</span> <span class="nav-text">新的关键字</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">linjiechuang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'h8QUIA5X9IkaSOPQT7xHEIPv-gzGzoHsz',
+        appKey: 'iYjdtrqeOsaEqgrfb20TOLE0',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
