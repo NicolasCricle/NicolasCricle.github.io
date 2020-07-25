@@ -55,152 +55,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Python 上下文管理</title>
-    <url>/2020/03/17/Python%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/</url>
-    <content><![CDATA[<h2 id="if之外的else"><a href="#if之外的else" class="headerlink" title="if之外的else"></a>if之外的else</h2><p>在Python中，else子句不仅仅能在if语句中使用，还能在try、for、while语句中使用。<br>for/else、try/else、while/else的语言关系比较像，但是这些都和if/else差别和大，具体的行为如下解释。</p>
-<a id="more"></a>
-
-<blockquote>
-<p>除了if/else之外，else在其他语句中的含义更像是单词“then”，表示完成之后再做这件事情。</p>
-</blockquote>
-<h3 id="for-else"><a href="#for-else" class="headerlink" title="for/else"></a>for/else</h3><p>当for循环完整运行结束的时候，即for循环没有被break语句中止，才会运行else语句。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> <span class="string">"aabbccdd"</span>:</span><br><span class="line">	<span class="keyword">if</span> item == <span class="string">"a"</span>:</span><br><span class="line">		<span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	print(<span class="string">"1ok!"</span>)</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> <span class="string">"aabbccdd"</span>:</span><br><span class="line">	<span class="keyword">if</span> item == <span class="string">"a"</span>:</span><br><span class="line">		<span class="keyword">continue</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	print(<span class="string">"2ok!"</span>)</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> <span class="string">"aabbccdd"</span>:</span><br><span class="line">	<span class="keyword">pass</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	print(<span class="string">"3ok!"</span>)</span><br></pre></td></tr></table></figure>
-<p>第二个和第三个的for循环都是可以触法else的字语句的，而第一个for循环由于被break关键字打断，所以else不会被触法。</p>
-<h3 id="while-else"><a href="#while-else" class="headerlink" title="while/else"></a>while/else</h3><p>仅当while循环因为条件为假值而退出的时候，即没有被break语句打断，才会运行else语句。</p>
-<h3 id="try-else"><a href="#try-else" class="headerlink" title="try/else"></a>try/else</h3><p>当try语句块中没有异常抛出的时候才会运行esle语句块，并且，else语句块中抛出的异常不会被前面的except语句处理。<br>通常情况下，我们会这样描述try语句。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">	dangerous_call()</span><br><span class="line">	after_call()</span><br><span class="line"><span class="keyword">except</span> SmaeError:</span><br><span class="line">	handler_error()</span><br></pre></td></tr></table></figure>
-<p>但是为了更准确以及更加清晰，try语句块中应该只抛出预期的异常错误，而对于after_call()应该是当dangerous_call()没有出现异常的时候才去执行。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">	dangerous_call()</span><br><span class="line"><span class="keyword">except</span> SmaeError:</span><br><span class="line">	handler_error()</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	after_call()</span><br></pre></td></tr></table></figure>
-
-<h2 id="with语句"><a href="#with语句" class="headerlink" title="with语句"></a>with语句</h2><p>上下文管理器协议包含__enter__以及__exit__两个方法。with语句开始执行的时候，会在上下文管理器对象上调用__enter__方法，而当with语句结束的时候，__exit__也会被上下文管理对象来执行，用于处理可能出现的异常。</p>
-<blockquote>
-<p>和迭代器的存在是为了管理for语句一样，上下文管理器的存在目的是管理with语句。<br>with语句的目的是简化try/finally模式。用于保证一段代码运行完毕后执行某项操作。即便那段代码由于异常、&gt;  return语句或者sys.exit()调用而终止，也会执行指定的操作。<br>finally子句中的代码通常用于释放重要的资源，或者还原临时变更的状态。 </p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">WithTest</span>:</span></span><br><span class="line">···		<span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">···			print(<span class="string">"enter"</span>)</span><br><span class="line">···		</span><br><span class="line">···		<span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, exc_type, exc_value, traceback)</span>:</span></span><br><span class="line">···			print(<span class="string">"exit"</span>)</span><br><span class="line">		</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">with</span> WithTest():</span><br><span class="line">···		print(<span class="string">"doing sth!"</span>)</span><br><span class="line">···</span><br><span class="line">enter</span><br><span class="line">doing sth!</span><br><span class="line">exit</span><br></pre></td></tr></table></figure>
-<p>当上下文管理器对象的__enter__并没有实际返回值的时候，是可以不需要as子句的。<br>在with语句的时候，as子句的作用就是将__enter__的返回值绑定到as子句后面的变量上。</p>
-<h3 id="enter-和-exit"><a href="#enter-和-exit" class="headerlink" title="__enter__和__exit__"></a>__enter__和__exit__</h3><p>解释器在调用__enter__方法的时候，除了隐形的self，不会传入任何参数。然而在调用<strong>exit</strong>的时候，除了self之外，会传递三个参数：<strong>exc_type</strong>、<strong>exc_value</strong>、<strong>traceback</strong>。</p>
-<ul>
-<li>exc_type:    异常类，如TypeError。</li>
-<li>exc_value:    异常的实例，有时候会有参数传给异常构造方法，例如错误的消息，这些参数可以使用exc_value.args获取。</li>
-<li>traceback：    traceback对象。</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WithTest</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, exc_type, exc_value, traceback)</span>:</span></span><br><span class="line">        print(exc_type)</span><br><span class="line">        print(exc_value)</span><br><span class="line">        print(traceback)</span><br><span class="line">        print(exc_value.args)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> WithTest():</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">"error"</span>)</span><br><span class="line">    </span><br><span class="line"><span class="string">""" 输出结果</span></span><br><span class="line"><span class="string">&lt;class 'Exception'&gt;</span></span><br><span class="line"><span class="string">error</span></span><br><span class="line"><span class="string">&lt;traceback object at 0x1008b7ac8&gt;</span></span><br><span class="line"><span class="string">('error',)</span></span><br><span class="line"><span class="string">Traceback (most recent call last):</span></span><br><span class="line"><span class="string">  File "/Users/livis/Desktop/notes/format_demo.py", line 55, in &lt;module&gt;</span></span><br><span class="line"><span class="string">    raise Exception("error")</span></span><br><span class="line"><span class="string">Exception: error</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="contextmanager装饰器"><a href="#contextmanager装饰器" class="headerlink" title="contextmanager装饰器"></a>contextmanager装饰器</h2><p>使用@contextmanager可以方便的创建由生成器函数构成的上下文管理器对象，可以极大的减少样本代码量。<br>在使用了@contextmanager装饰的生成器中，yield关键字是把函数的定义体分成两个部分，yield之前的部分就相当于__enter__方法执行的内容，而yield之后的部分就相当于__exit__方法执行的内容。而yield的内容就是__enter__返还的，可以使用as子语句绑定的返回对象。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> contextlib <span class="keyword">import</span> contextmanager</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@contextmanager</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">contenx_test</span><span class="params">(mystr)</span>:</span></span><br><span class="line">	print(<span class="string">"before enter!"</span>)</span><br><span class="line">	error = <span class="literal">None</span></span><br><span class="line">	<span class="keyword">try</span>:</span><br><span class="line">	    <span class="keyword">yield</span> mystr</span><br><span class="line">	<span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">	    error = e</span><br><span class="line">	<span class="keyword">finally</span>:</span><br><span class="line">	    print(<span class="string">"before exit!"</span>)</span><br><span class="line">	    <span class="keyword">if</span> error:</span><br><span class="line">	        print(error)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> demo(<span class="string">'abc'</span>) <span class="keyword">as</span> f:</span><br><span class="line">	print(<span class="string">"handle!"</span>)</span><br><span class="line">	<span class="keyword">raise</span> Exception(<span class="string">"some things"</span>)</span><br><span class="line"></span><br><span class="line">print(f)</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">before enter!</span></span><br><span class="line"><span class="string">handle!</span></span><br><span class="line"><span class="string">before exit!</span></span><br><span class="line"><span class="string">some things</span></span><br><span class="line"><span class="string">abc</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
-<p>context_test生成器被contextmanager装饰之后，就可以当作上下文管理器对象来使用。当使用with语句启动的时候：</p>
-<ul>
-<li>首先执行yield之前的内容，所以before enter被打印；</li>
-<li>接下来执行with语句块的内容，handle被打印；</li>
-<li>然后raise抛出了异常，触法了yield之后的内容，before exit和some things相继被打印；</li>
-<li>由于abc被yield返还， 被as子语句绑定到了f变量上，所以打印f变量的时候，输出的就是abc</li>
-</ul>
-<blockquote>
-<p>被contextmanager装饰器装饰的生成器中，yield关键字和迭代没有任何关系。与之相比，此处更像是协程，代码执行到某一点之后暂停，去执行客户代码，直到客户代码再次启动协程。</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>Python</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-        <tag>上下文</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Python运算符重载</title>
-    <url>/2020/02/07/Python%E7%9A%84%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/</url>
-    <content><![CDATA[<h2 id="Python运算符重载的限制"><a href="#Python运算符重载的限制" class="headerlink" title="Python运算符重载的限制"></a>Python运算符重载的限制</h2><p>合适的运用运算符重载，能够让你的代码看起来整洁、可读性强。然而，不分场合不分地点的重载运算符，则会是一场灾难。<br>Python对于运算符重载做了一些限制，以平衡其灵活性、安全性以及可用性。 </p>
-<a id="more"></a>
-<ul>
-<li>不能重载内置数据类型的运算符  </li>
-<li>不能新建运算符，只能重载现有的  </li>
-<li>某些运算符无法进行重载，例如 <strong>is or and not</strong></li>
-</ul>
-<h2 id="一元运算符的重载"><a href="#一元运算符的重载" class="headerlink" title="一元运算符的重载"></a>一元运算符的重载</h2><h3 id="一元运算符介绍"><a href="#一元运算符介绍" class="headerlink" title="一元运算符介绍"></a>一元运算符介绍</h3><p>在Python中 常见的一元运算符是 <strong>+</strong> 以及 <strong>-</strong>，除此之外，还有一个不多见的一元运算符 <strong>~</strong></p>
-<blockquote>
-<p><strong>~</strong> 运算符称之为 位非运算，其定义是将每个二进制取反，详细算法可以自行google，简单的记忆方法为：假如A为整数 ~A == -(A+1)</p>
-</blockquote>
-<blockquote>
-<p><strong>+</strong> 运算符 通常情况下 +A == A总是成立的</p>
-</blockquote>
-<blockquote>
-<p><strong>-</strong> 运算符 取负算术运算符 如果A是-1 则 -A == 1</p>
-</blockquote>
-<h3 id="对应的特殊方法名称"><a href="#对应的特殊方法名称" class="headerlink" title="对应的特殊方法名称"></a>对应的特殊方法名称</h3><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>特殊方法</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>+</td>
-<td>__neg__</td>
-</tr>
-<tr>
-<td>-</td>
-<td>__pos__</td>
-</tr>
-<tr>
-<td>~</td>
-<td>__invert__</td>
-</tr>
-</tbody></table>
-<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>支持一元运算符很简单，只需要实现相应的特殊方法就行了，并且这几个特殊方法都只有一个参数 <strong>self</strong>，<br>但是要遵循运算符的一个基本法则：始终返还一个新的对象</p>
-<p>为了方便说明接下来的运算符重载，定义一个新的数据类型—向量，实现其基本代码</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vector</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, x, y)</span>:</span></span><br><span class="line">		self.x = x</span><br><span class="line">		self.y = y</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">"&#123;&#125;(&#123;!r&#125;, &#123;!r&#125;)"</span>.format(self.__class__.__name__, *self)</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> (item <span class="keyword">for</span> item <span class="keyword">in</span> (self.x, self.y))</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__abs__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> math.sqrt(sum(x*x <span class="keyword">for</span> x <span class="keyword">in</span> self))</span><br></pre></td></tr></table></figure>
-<p>需要向量数据结构达到下面的效果</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>v = Vector(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>-v</span><br><span class="line">Vector(<span class="number">-1</span>, <span class="number">-1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>+v</span><br><span class="line">Vector(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>+v <span class="keyword">is</span> v				<span class="comment"># 返还的是一个新的对象</span></span><br><span class="line"><span class="literal">False</span></span><br></pre></td></tr></table></figure>
-
-<p>为Vector类添加特殊方法,</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__pos__</span><span class="params">(self)</span>:</span></span><br><span class="line">	cls = type(self)</span><br><span class="line">	<span class="keyword">return</span> cls(*self)</span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__neg__</span><span class="params">(self)</span>:</span></span><br><span class="line">	cls = type(self)</span><br><span class="line">	<span class="keyword">return</span> cls(*(-item <span class="keyword">for</span> item <span class="keyword">in</span> self))</span><br></pre></td></tr></table></figure>
-<p>对Vector类来说，已经实现了<strong>iter</strong>方法，并且在其中将构造Vector的数据全部返还，所以在新增的特殊方法中，直接对其使用拆包</p>
-<h2 id="中缀运算符的重载"><a href="#中缀运算符的重载" class="headerlink" title="中缀运算符的重载"></a>中缀运算符的重载</h2><ul>
-<li>中缀运算符 与之前一元运算符+不同，这里的+表示两个对象相加，而不是取正<br>向量加法定义中说明：两个向量可以叠加成一个新的向量。它的各个分量是两个相应向量的对应分量之和</li>
-</ul>
-<h3 id="涉及到的相应地特殊方法"><a href="#涉及到的相应地特殊方法" class="headerlink" title="涉及到的相应地特殊方法"></a>涉及到的相应地特殊方法</h3><table>
-<thead>
-<tr>
-<th>运算符</th>
-<th>特殊方法</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>self + other</td>
-<td>__add__</td>
-<td>左分派</td>
-</tr>
-<tr>
-<td>other + self</td>
-<td>__radd__</td>
-<td>右分派（后备机制）</td>
-</tr>
-</tbody></table>
-<h3 id="使用-add-以及-radd-计算-a-b-的流程图"><a href="#使用-add-以及-radd-计算-a-b-的流程图" class="headerlink" title="使用__add__以及__radd__计算 a + b 的流程图"></a>使用__add__以及__radd__计算 a + b 的流程图</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">graph LR</span><br><span class="line">    A[a+b]--&gt;B&#123;a有__add__&#125;</span><br><span class="line">    B--Yes--&gt;C[获取a.__add__的结果]</span><br><span class="line">    C--&gt;D&#123;NotImplemented&#125;</span><br><span class="line">    D--No--&gt;E[返回结果]</span><br><span class="line">    D--Yes--&gt;F&#123;b有__radd__&#125;</span><br><span class="line">    B--No--&gt;F</span><br><span class="line">    F--&gt;G[获取b.__radd__的结果]</span><br><span class="line">    G--&gt;H&#123;NotInplemented&#125;</span><br><span class="line">    H--NO--&gt;E</span><br><span class="line">    H--Yes--&gt;I[抛出TypeError]</span><br><span class="line">    F--No--&gt;I</span><br></pre></td></tr></table></figure>
-<p>__radd__是__add__的反向版本，是一种后背的机制，如果左操作数没有实现__add__方法，或者说实现了但是返还的是NotImplemented，那么Python解释器就会调用右操作数的__radd__方法来执行此次的+运算。</p>
-<blockquote>
-<p>NotImplemented 和 NotImplementedError<br>前者是特殊的一个单例值，当中缀运算符特殊方法不能处理给定的操作数的时候，就要把它返回。<br>后者是一种异常，一般由抽象类中的占位方法直接抛出，提醒子类必须覆盖。</p>
-</blockquote>
-<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__add__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	cls = type(self)</span><br><span class="line">	<span class="keyword">try</span>:</span><br><span class="line">		<span class="keyword">return</span> cls(*(x+y <span class="keyword">for</span> x, y <span class="keyword">in</span>  zip(self, other)))</span><br><span class="line">	<span class="keyword">except</span> TypeError:</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">NotImplemented</span></span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__radd__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> self + other</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">对于 \_\_add\_\_来说,将左操作对象与右操作对象 各位叠加，然后生成一个新的Vector返还  </span><br><span class="line">而对于\_\_radd\_\_而言，a + b 本来触动的是 右操作数b的 \_\_radd\_\_方法，在这个方法实现里直接将a, b调换，从而执行 b + a 运算。  </span><br><span class="line">如果other对象是不可迭代的，zip函数会返回TypeError错误，这里将其捕捉，然后统一返回指定错误<span class="built_in">NotImplemented</span></span><br><span class="line"></span><br><span class="line">&gt; zip函数  </span><br><span class="line">&gt; 使用zip函数可以轻松的并行迭代两个或多个可迭代对象，当其中任意一个迭代对象迭代终止的时候，zip函数立即停止，而不会发出警告  </span><br><span class="line">&gt; \&gt;&gt;&gt;a = (<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)    </span><br><span class="line">&gt; \&gt;&gt;&gt;b = (<span class="number">5</span>, <span class="number">6</span>)  </span><br><span class="line">&gt; \&gt;&gt;&gt;list(zip(a, b, fillvalue=<span class="number">0</span>))  </span><br><span class="line">&gt; [(<span class="number">1</span>, <span class="number">5</span>), (<span class="number">2</span>, <span class="number">6</span>)]  </span><br><span class="line">&gt; itertools包中有一个zip\_longest函数，可以设置迭代缺失值  **fillvalue**  </span><br><span class="line">&gt;  \&gt;&gt;&gt;<span class="keyword">import</span> itertools  </span><br><span class="line">&gt;  \&gt;&gt;&gt;functools.zip_longest(a, b, fillvalue=<span class="number">0</span>)  </span><br><span class="line">&gt; [(<span class="number">1</span>, <span class="number">5</span>), (<span class="number">2</span>, <span class="number">6</span>), (<span class="number">3</span>, <span class="number">0</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment">### 其余的中缀运算符</span></span><br><span class="line">|  运算符   | 正向方法  | 反向方法 | 就地方法 | 说明 |</span><br><span class="line">|  ----  | ----  | ---- | ---- | ---- | ---- |</span><br><span class="line">| + | \_\_add\_\_ | \_\_radd\_\_ | \_\_iadd\_\_ | 加法或者拼接 |</span><br><span class="line">| - | \_\_sub\_\_ | \_\_rsub\_\_ | \_\_isub\_\_ | 减法 |</span><br><span class="line">| * | \_\_mul\_\_ | \_\_rmul\_\_ | \_\_imul\_\_ | 乘法 | </span><br><span class="line">| / | \_\_truediv\_\_ | \_\_rturediv\_\_ | \_\_iturediv\_\_ | 除法 |</span><br><span class="line">| // | \_\_floordiv\_\_ | \_\_rfloordiv\_\_ | \_\_floordiv\_\_ | 整除、地板除 |</span><br><span class="line">| % | \_\_mod\_\_ | \_\_rmod\_\_ | \_\_imod\_\_ | 取模 |</span><br><span class="line">| divmod() | \_\_divmod\_\_ | \_\_rdivmod\_\_ | \_\_idivmod\_\_ | 返回由整除的商和模数构成的元祖 |</span><br><span class="line">| ** pow() | \_\_pow\_\_ | \_\_rpow\_\_ | \_\_ipow\_\_ | 幂运算 |</span><br><span class="line">| &amp; | \_\_and\_\_ | \_\_rand\_\_ | \_\_iand\_\_ | 位与运算 |</span><br><span class="line">| \| | \_\_or\_\_ | \_\_ror\_\_ | \_\_ior\_\_ | 位或运算 |</span><br><span class="line">| ^ | \_\_xor\_\_ | \_\_rxor\_\_ | \_\_ixor\_\_ | 位 异或运算 |</span><br><span class="line">| &lt;&lt; | \_\_lshift\_\_ | \_\_rlshift\_\_ | \_\_ilshift\_\_ | 按位左移 |</span><br><span class="line">| &gt;&gt; | \_\_rshift\_\_ | \_\_rrshift\_\_ | \_\_irshift\_\_ | 按位右移 |</span><br><span class="line">| @ | \_\_matmul\_\_ | \_\_rmatmul\_\_ | \_\_imatmul\_\_ | 矩阵乘法（<span class="number">3.5</span>以后Python版本支持） |</span><br><span class="line"></span><br><span class="line"><span class="comment">## 比较运算符的重载</span></span><br><span class="line">在Python中，常见的比较运算符有 **== 、!=、 &gt;、 &lt;、 &gt;=、 &lt;=**。  </span><br><span class="line">对于这些运算符的处理流程与之前的中缀运算符类似，但是也有两个重大的区别：  </span><br><span class="line"></span><br><span class="line">* 正向和反向调用使用的是**一个系列**的方法，比如对于 == 而言，正向调用和反向调用都是用的是 \_\_eq\_\_ 方法， 区别在于参数对调；而 &gt; 的正向调用是  &lt; 的反向调用 \_\_gt\_\_, 反向调用时 &lt; 的正向调用 \_\_lt\_\_。</span><br><span class="line">* 对于 == 以及 != 而言，反向调用失败后并不会直接抛出TypeError， 而是比较对象的ID。  </span><br><span class="line"></span><br><span class="line"><span class="comment">### 涉及到的方法</span></span><br><span class="line">|  运算符   | 特殊方法  |</span><br><span class="line">|  ----  | ----  |</span><br><span class="line">| == | \_\_eq\_\_ |</span><br><span class="line"></span><br><span class="line"><span class="comment">### 代码实现</span></span><br><span class="line">需要达到的效果示下  </span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>Vector(<span class="number">1</span>, <span class="number">2</span>) == Vector(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="literal">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>Vector(<span class="number">1</span>, <span class="number">2</span>) == Vector(<span class="number">2</span>, <span class="number">1</span>)</span><br><span class="line"><span class="literal">False</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__eq__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> tuple(self) == tuple(other)</span><br></pre></td></tr></table></figure>
-<p>简单的方法如上，直接按照向量相等的比较规则定义，比较向量的两个分量的大小。<br>但是也会出现如下BUG</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>Vector(<span class="number">1</span>, <span class="number">2</span>) == (<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="literal">True</span></span><br></pre></td></tr></table></figure>
-<p>为防止出现上述问题，可以下改一下__eq__函数，加上类型限定。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__eq__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> isinstance(other, Vector):</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">NotImplemented</span></span><br><span class="line">	<span class="keyword">return</span> tuple(self) == tuple(other)</span><br></pre></td></tr></table></figure>
-<h3 id="其余的比较运算符"><a href="#其余的比较运算符" class="headerlink" title="其余的比较运算符"></a>其余的比较运算符</h3><p>|  运算符   | 正向方法调用  | 反向方法调用 | 后备机制 |<br>|  —-  | —-  | —- | —- | —- |<br>| a==b | a.__eq__(b) | b.__eq__(a) | id(a) == id(b) |<br>| a!=b | a.__ne__(b) | b.__ne__(a) | not (a == b) |<br>| a&gt;b | a.__gt__(b) | b.__lt__(a) | 抛出TypeError |<br>| a&lt;b | a.__lt__(b) | b.__gt__(a) | 抛出TypeError |<br>| a&gt;=b | a.__ge__(b) | b.__le__(a) | 抛出TypeError |<br>| a&lt;=b | a.__le__(b) | b.__ge__(a) | 抛出TypeError |</p>
-]]></content>
-      <categories>
-        <category>Python</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-        <tag>运算符重载</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>MySQL概述</title>
     <url>/2019/09/01/mysql%E6%A6%82%E8%BF%B0/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在做后端开发的这些年里，用过不少数据库，比如MySQL、MongoDb、redis、SQLServer等等，用的最多的还是MySQL。但长久以来，大部分对于MySQL的操作就局限于增删改查，没有更深一层次的了解。有空的时候，正想对此有一个系统化的梳理。在网上看到一个比较不错的作者写了一本MySQL的进阶书籍。</p>
@@ -312,6 +166,136 @@
       </tags>
   </entry>
   <entry>
+    <title>使用future处理并发</title>
+    <url>/2020/04/11/%E4%BD%BF%E7%94%A8future%E5%A4%84%E7%90%86%E5%B9%B6%E5%8F%91/</url>
+    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>concurrent.future模块的主要特色是<strong>ThreadPoolExecutor</strong>以及<strong>ProcessPoolExecutor</strong>。这两个类实现的接口能分别在不同的线程或者进程中指定<strong>可调用对象</strong>。<br>这两个类在内部维护着一个工作的线程/进程池，以及要实现的任务队列。不过接口抽象的层级很高，一般的简单并发任务，无需关心实现的细节。</p>
+<a id="more"></a>
+<h2 id="future"><a href="#future" class="headerlink" title="future"></a>future</h2><p>Python3.4起，标准库中有两个名为Future的类：</p>
+<ul>
+<li><p>concurrent.futures.Future</p>
+</li>
+<li><p>asyncio.Feture<br>其Future的实例表示<strong>可能已经完成</strong>和<strong>尚未完成</strong>的延迟任务。<br>使用Future的实例封装待完成操作，可以将其放入队列，并且其完成的状态可以查询，获取结果/异常。<br>对于编程人员而言，没有特殊情况最好不要自己是实例化Future，而将这项任务交由并发框架完成。原因很简单：future表示终将要发生的事情。也就是说这项任务的执行时间已经排定了。因此，只有排定将某件事情交给concurent.futures.Executor子类处理的时候，才会创建concurrent.futures.Future实例。<br>同时，客户端的代码最好不要去改变future的状态，因为我们无法控制计算何时结束。<br>future的一些常用方法：</p>
+</li>
+<li><p>done()    方法不阻塞，返回的是布尔值，表明future链接的可调用对象是否已经调用结束。</p>
+</li>
+<li><p>add_done_callback(caller)        接受一个可调用对象，当future链接的可调用对象调用结束的时候，将其当作回调函数执行。</p>
+</li>
+<li><p>result()    当future运行结束的时候调用该方法，则返回可调用对象的结果/异常。</p>
+</li>
+</ul>
+<h2 id="excutor的submit和map"><a href="#excutor的submit和map" class="headerlink" title="excutor的submit和map"></a>excutor的submit和map</h2><p>实现一个下载任务的例子</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> concurrent.futures.thread <span class="keyword">import</span> ThreadPoolExecutor</span><br><span class="line"><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> as_completed</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">CC          = <span class="string">'CN IN US ID BP PK NG BD RU JP'</span>.split()</span><br><span class="line">BASE_URL    = <span class="string">'http://flupy.org/data/flags'</span></span><br><span class="line">DIR         = <span class="string">'/Users/livis/Desktop'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">save_flag</span><span class="params">(img, name)</span>:</span></span><br><span class="line">    path = os.path.join(DIR, name)</span><br><span class="line">    <span class="keyword">with</span> open(path, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(img)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span><span class="params">(text)</span>:</span></span><br><span class="line">    print(text, end=<span class="string">''</span>)</span><br><span class="line">    sys.stdout.flush()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_flag</span><span class="params">(cc)</span>:</span></span><br><span class="line">    url = <span class="string">'&#123;&#125;/&#123;&#125;/&#123;&#125;.gif'</span>.format(BASE_URL, cc.lower(), cc.lower())</span><br><span class="line">    res = requests.get(url)</span><br><span class="line">    <span class="keyword">return</span> res.content</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">download_one</span><span class="params">(cc)</span>:</span></span><br><span class="line">    image = get_flag(cc)</span><br><span class="line">    show(cc)</span><br><span class="line">    save_flag(image, cc.lower() + <span class="string">'.gif'</span>)</span><br><span class="line">    <span class="keyword">return</span> cc</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">download_many_map</span><span class="params">(ccs)</span>:</span></span><br><span class="line">    workers = len(ccs)</span><br><span class="line">    <span class="keyword">with</span> ThreadPoolExecutor(workers) <span class="keyword">as</span> executor:</span><br><span class="line">        res = executor.map(download_one, ccs)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> len(list(res))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">download_many_submit</span><span class="params">(ccs)</span>:</span></span><br><span class="line">    workers = len(ccs)</span><br><span class="line">    futures = list()</span><br><span class="line">    results = list()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">with</span> ThreadPoolExecutor(workers) <span class="keyword">as</span> executor:</span><br><span class="line">        <span class="keyword">for</span> cc <span class="keyword">in</span> ccs:</span><br><span class="line">            futures.append(executor.submit(download_one, cc))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> future <span class="keyword">in</span> as_completed(futures):</span><br><span class="line">            res = future.result()</span><br><span class="line"></span><br><span class="line">            results.append(res)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> len(results)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="comment"># download_many_submit(CC)</span></span><br><span class="line">    download_many_map(CC)</span><br></pre></td></tr></table></figure>
+<p>使用map，获取的结果顺序不会会变化。<br>而使用submit，获取的结果的顺序会发生改变。</p>
+<h2 id="显示任务处理进度"><a href="#显示任务处理进度" class="headerlink" title="显示任务处理进度"></a>显示任务处理进度</h2><p>为任务处理添加可视化的进度显示，可以使用TQDM模块实现。</p>
+<h3 id="最简单的tqdm示例"><a href="#最简单的tqdm示例" class="headerlink" title="最简单的tqdm示例"></a>最简单的tqdm示例</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> tqdm <span class="keyword">import</span> tqdm  </span><br><span class="line">In [<span class="number">2</span>]: <span class="keyword">import</span> time </span><br><span class="line">In [<span class="number">3</span>]: <span class="keyword">for</span> item <span class="keyword">in</span> tqdm(range(<span class="number">10</span>)): </span><br><span class="line">   ...:     time.sleep(<span class="number">0.2</span>) </span><br><span class="line">   ...:                                                                                                         </span><br><span class="line"><span class="number">100</span>%|████████████████████████████ <span class="number">10</span>/<span class="number">10</span> [<span class="number">00</span>:<span class="number">02</span>&lt;<span class="number">00</span>:<span class="number">00</span>,  <span class="number">4.91</span>it/s]</span><br></pre></td></tr></table></figure>
+<p>tqdm能够实现任何的可迭代对象，生成一个迭代器。使用这个迭代器的时候，显示进度条和完成全部迭代预计的剩余时间。</p>
+<h3 id="将任务进度和as-completed结合"><a href="#将任务进度和as-completed结合" class="headerlink" title="将任务进度和as_completed结合"></a>将任务进度和as_completed结合</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">download_many_submit</span><span class="params">(css)</span>:</span></span><br><span class="line">	......</span><br><span class="line">	<span class="keyword">with</span> ThreadPoolExecutor(workers) <span class="keyword">as</span> executor:</span><br><span class="line">	        <span class="keyword">for</span> cc <span class="keyword">in</span> ccs:</span><br><span class="line">	            futures.append(executor.submit(download_one, cc))</span><br><span class="line">	</span><br><span class="line">	        it = tqdm.tqdm(as_completed(futures), total=len(CC))</span><br><span class="line">	        <span class="keyword">for</span> future <span class="keyword">in</span> it:</span><br><span class="line">	            res = future.result()</span><br><span class="line">	</span><br><span class="line">	            results.append(res)</span><br><span class="line">	......</span><br></pre></td></tr></table></figure>
+<p>as_completed()返回的是个可迭代对象，因此可以使用tqdm。<br>需要注意的是，因为as_completed()无法使用len，所以需要显示的指定元素的数量，这样才能预计剩余的工作量。</p>
+]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>多线程</tag>
+        <tag>并发</tag>
+        <tag>future</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python运算符重载</title>
+    <url>/2020/02/07/Python%E7%9A%84%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/</url>
+    <content><![CDATA[<h2 id="Python运算符重载的限制"><a href="#Python运算符重载的限制" class="headerlink" title="Python运算符重载的限制"></a>Python运算符重载的限制</h2><p>合适的运用运算符重载，能够让你的代码看起来整洁、可读性强。然而，不分场合不分地点的重载运算符，则会是一场灾难。<br>Python对于运算符重载做了一些限制，以平衡其灵活性、安全性以及可用性。 </p>
+<a id="more"></a>
+<ul>
+<li>不能重载内置数据类型的运算符  </li>
+<li>不能新建运算符，只能重载现有的  </li>
+<li>某些运算符无法进行重载，例如 <strong>is or and not</strong></li>
+</ul>
+<h2 id="一元运算符的重载"><a href="#一元运算符的重载" class="headerlink" title="一元运算符的重载"></a>一元运算符的重载</h2><h3 id="一元运算符介绍"><a href="#一元运算符介绍" class="headerlink" title="一元运算符介绍"></a>一元运算符介绍</h3><p>在Python中 常见的一元运算符是 <strong>+</strong> 以及 <strong>-</strong>，除此之外，还有一个不多见的一元运算符 <strong>~</strong></p>
+<blockquote>
+<p><strong>~</strong> 运算符称之为 位非运算，其定义是将每个二进制取反，详细算法可以自行google，简单的记忆方法为：假如A为整数 ~A == -(A+1)</p>
+</blockquote>
+<blockquote>
+<p><strong>+</strong> 运算符 通常情况下 +A == A总是成立的</p>
+</blockquote>
+<blockquote>
+<p><strong>-</strong> 运算符 取负算术运算符 如果A是-1 则 -A == 1</p>
+</blockquote>
+<h3 id="对应的特殊方法名称"><a href="#对应的特殊方法名称" class="headerlink" title="对应的特殊方法名称"></a>对应的特殊方法名称</h3><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>特殊方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>+</td>
+<td>__neg__</td>
+</tr>
+<tr>
+<td>-</td>
+<td>__pos__</td>
+</tr>
+<tr>
+<td>~</td>
+<td>__invert__</td>
+</tr>
+</tbody></table>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>支持一元运算符很简单，只需要实现相应的特殊方法就行了，并且这几个特殊方法都只有一个参数 <strong>self</strong>，<br>但是要遵循运算符的一个基本法则：始终返还一个新的对象</p>
+<p>为了方便说明接下来的运算符重载，定义一个新的数据类型—向量，实现其基本代码</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vector</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, x, y)</span>:</span></span><br><span class="line">		self.x = x</span><br><span class="line">		self.y = y</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">"&#123;&#125;(&#123;!r&#125;, &#123;!r&#125;)"</span>.format(self.__class__.__name__, *self)</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> (item <span class="keyword">for</span> item <span class="keyword">in</span> (self.x, self.y))</span><br><span class="line">		</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__abs__</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">return</span> math.sqrt(sum(x*x <span class="keyword">for</span> x <span class="keyword">in</span> self))</span><br></pre></td></tr></table></figure>
+<p>需要向量数据结构达到下面的效果</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>v = Vector(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>-v</span><br><span class="line">Vector(<span class="number">-1</span>, <span class="number">-1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>+v</span><br><span class="line">Vector(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>+v <span class="keyword">is</span> v				<span class="comment"># 返还的是一个新的对象</span></span><br><span class="line"><span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<p>为Vector类添加特殊方法,</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__pos__</span><span class="params">(self)</span>:</span></span><br><span class="line">	cls = type(self)</span><br><span class="line">	<span class="keyword">return</span> cls(*self)</span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__neg__</span><span class="params">(self)</span>:</span></span><br><span class="line">	cls = type(self)</span><br><span class="line">	<span class="keyword">return</span> cls(*(-item <span class="keyword">for</span> item <span class="keyword">in</span> self))</span><br></pre></td></tr></table></figure>
+<p>对Vector类来说，已经实现了<strong>iter</strong>方法，并且在其中将构造Vector的数据全部返还，所以在新增的特殊方法中，直接对其使用拆包</p>
+<h2 id="中缀运算符的重载"><a href="#中缀运算符的重载" class="headerlink" title="中缀运算符的重载"></a>中缀运算符的重载</h2><ul>
+<li>中缀运算符 与之前一元运算符+不同，这里的+表示两个对象相加，而不是取正<br>向量加法定义中说明：两个向量可以叠加成一个新的向量。它的各个分量是两个相应向量的对应分量之和</li>
+</ul>
+<h3 id="涉及到的相应地特殊方法"><a href="#涉及到的相应地特殊方法" class="headerlink" title="涉及到的相应地特殊方法"></a>涉及到的相应地特殊方法</h3><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>特殊方法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>self + other</td>
+<td>__add__</td>
+<td>左分派</td>
+</tr>
+<tr>
+<td>other + self</td>
+<td>__radd__</td>
+<td>右分派（后备机制）</td>
+</tr>
+</tbody></table>
+<h3 id="使用-add-以及-radd-计算-a-b-的流程图"><a href="#使用-add-以及-radd-计算-a-b-的流程图" class="headerlink" title="使用__add__以及__radd__计算 a + b 的流程图"></a>使用__add__以及__radd__计算 a + b 的流程图</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">graph LR</span><br><span class="line">    A[a+b]--&gt;B&#123;a有__add__&#125;</span><br><span class="line">    B--Yes--&gt;C[获取a.__add__的结果]</span><br><span class="line">    C--&gt;D&#123;NotImplemented&#125;</span><br><span class="line">    D--No--&gt;E[返回结果]</span><br><span class="line">    D--Yes--&gt;F&#123;b有__radd__&#125;</span><br><span class="line">    B--No--&gt;F</span><br><span class="line">    F--&gt;G[获取b.__radd__的结果]</span><br><span class="line">    G--&gt;H&#123;NotInplemented&#125;</span><br><span class="line">    H--NO--&gt;E</span><br><span class="line">    H--Yes--&gt;I[抛出TypeError]</span><br><span class="line">    F--No--&gt;I</span><br></pre></td></tr></table></figure>
+<p>__radd__是__add__的反向版本，是一种后背的机制，如果左操作数没有实现__add__方法，或者说实现了但是返还的是NotImplemented，那么Python解释器就会调用右操作数的__radd__方法来执行此次的+运算。</p>
+<blockquote>
+<p>NotImplemented 和 NotImplementedError<br>前者是特殊的一个单例值，当中缀运算符特殊方法不能处理给定的操作数的时候，就要把它返回。<br>后者是一种异常，一般由抽象类中的占位方法直接抛出，提醒子类必须覆盖。</p>
+</blockquote>
+<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__add__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	cls = type(self)</span><br><span class="line">	<span class="keyword">try</span>:</span><br><span class="line">		<span class="keyword">return</span> cls(*(x+y <span class="keyword">for</span> x, y <span class="keyword">in</span>  zip(self, other)))</span><br><span class="line">	<span class="keyword">except</span> TypeError:</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">NotImplemented</span></span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__radd__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> self + other</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">对于 \_\_add\_\_来说,将左操作对象与右操作对象 各位叠加，然后生成一个新的Vector返还  </span><br><span class="line">而对于\_\_radd\_\_而言，a + b 本来触动的是 右操作数b的 \_\_radd\_\_方法，在这个方法实现里直接将a, b调换，从而执行 b + a 运算。  </span><br><span class="line">如果other对象是不可迭代的，zip函数会返回TypeError错误，这里将其捕捉，然后统一返回指定错误<span class="built_in">NotImplemented</span></span><br><span class="line"></span><br><span class="line">&gt; zip函数  </span><br><span class="line">&gt; 使用zip函数可以轻松的并行迭代两个或多个可迭代对象，当其中任意一个迭代对象迭代终止的时候，zip函数立即停止，而不会发出警告  </span><br><span class="line">&gt; \&gt;&gt;&gt;a = (<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)    </span><br><span class="line">&gt; \&gt;&gt;&gt;b = (<span class="number">5</span>, <span class="number">6</span>)  </span><br><span class="line">&gt; \&gt;&gt;&gt;list(zip(a, b, fillvalue=<span class="number">0</span>))  </span><br><span class="line">&gt; [(<span class="number">1</span>, <span class="number">5</span>), (<span class="number">2</span>, <span class="number">6</span>)]  </span><br><span class="line">&gt; itertools包中有一个zip\_longest函数，可以设置迭代缺失值  **fillvalue**  </span><br><span class="line">&gt;  \&gt;&gt;&gt;<span class="keyword">import</span> itertools  </span><br><span class="line">&gt;  \&gt;&gt;&gt;functools.zip_longest(a, b, fillvalue=<span class="number">0</span>)  </span><br><span class="line">&gt; [(<span class="number">1</span>, <span class="number">5</span>), (<span class="number">2</span>, <span class="number">6</span>), (<span class="number">3</span>, <span class="number">0</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment">### 其余的中缀运算符</span></span><br><span class="line">|  运算符   | 正向方法  | 反向方法 | 就地方法 | 说明 |</span><br><span class="line">|  ----  | ----  | ---- | ---- | ---- | ---- |</span><br><span class="line">| + | \_\_add\_\_ | \_\_radd\_\_ | \_\_iadd\_\_ | 加法或者拼接 |</span><br><span class="line">| - | \_\_sub\_\_ | \_\_rsub\_\_ | \_\_isub\_\_ | 减法 |</span><br><span class="line">| * | \_\_mul\_\_ | \_\_rmul\_\_ | \_\_imul\_\_ | 乘法 | </span><br><span class="line">| / | \_\_truediv\_\_ | \_\_rturediv\_\_ | \_\_iturediv\_\_ | 除法 |</span><br><span class="line">| // | \_\_floordiv\_\_ | \_\_rfloordiv\_\_ | \_\_floordiv\_\_ | 整除、地板除 |</span><br><span class="line">| % | \_\_mod\_\_ | \_\_rmod\_\_ | \_\_imod\_\_ | 取模 |</span><br><span class="line">| divmod() | \_\_divmod\_\_ | \_\_rdivmod\_\_ | \_\_idivmod\_\_ | 返回由整除的商和模数构成的元祖 |</span><br><span class="line">| ** pow() | \_\_pow\_\_ | \_\_rpow\_\_ | \_\_ipow\_\_ | 幂运算 |</span><br><span class="line">| &amp; | \_\_and\_\_ | \_\_rand\_\_ | \_\_iand\_\_ | 位与运算 |</span><br><span class="line">| \| | \_\_or\_\_ | \_\_ror\_\_ | \_\_ior\_\_ | 位或运算 |</span><br><span class="line">| ^ | \_\_xor\_\_ | \_\_rxor\_\_ | \_\_ixor\_\_ | 位 异或运算 |</span><br><span class="line">| &lt;&lt; | \_\_lshift\_\_ | \_\_rlshift\_\_ | \_\_ilshift\_\_ | 按位左移 |</span><br><span class="line">| &gt;&gt; | \_\_rshift\_\_ | \_\_rrshift\_\_ | \_\_irshift\_\_ | 按位右移 |</span><br><span class="line">| @ | \_\_matmul\_\_ | \_\_rmatmul\_\_ | \_\_imatmul\_\_ | 矩阵乘法（<span class="number">3.5</span>以后Python版本支持） |</span><br><span class="line"></span><br><span class="line"><span class="comment">## 比较运算符的重载</span></span><br><span class="line">在Python中，常见的比较运算符有 **== 、!=、 &gt;、 &lt;、 &gt;=、 &lt;=**。  </span><br><span class="line">对于这些运算符的处理流程与之前的中缀运算符类似，但是也有两个重大的区别：  </span><br><span class="line"></span><br><span class="line">* 正向和反向调用使用的是**一个系列**的方法，比如对于 == 而言，正向调用和反向调用都是用的是 \_\_eq\_\_ 方法， 区别在于参数对调；而 &gt; 的正向调用是  &lt; 的反向调用 \_\_gt\_\_, 反向调用时 &lt; 的正向调用 \_\_lt\_\_。</span><br><span class="line">* 对于 == 以及 != 而言，反向调用失败后并不会直接抛出TypeError， 而是比较对象的ID。  </span><br><span class="line"></span><br><span class="line"><span class="comment">### 涉及到的方法</span></span><br><span class="line">|  运算符   | 特殊方法  |</span><br><span class="line">|  ----  | ----  |</span><br><span class="line">| == | \_\_eq\_\_ |</span><br><span class="line"></span><br><span class="line"><span class="comment">### 代码实现</span></span><br><span class="line">需要达到的效果示下  </span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>Vector(<span class="number">1</span>, <span class="number">2</span>) == Vector(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="literal">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>Vector(<span class="number">1</span>, <span class="number">2</span>) == Vector(<span class="number">2</span>, <span class="number">1</span>)</span><br><span class="line"><span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__eq__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> tuple(self) == tuple(other)</span><br></pre></td></tr></table></figure>
+<p>简单的方法如上，直接按照向量相等的比较规则定义，比较向量的两个分量的大小。<br>但是也会出现如下BUG</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>Vector(<span class="number">1</span>, <span class="number">2</span>) == (<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<p>为防止出现上述问题，可以下改一下__eq__函数，加上类型限定。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__eq__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> isinstance(other, Vector):</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">NotImplemented</span></span><br><span class="line">	<span class="keyword">return</span> tuple(self) == tuple(other)</span><br></pre></td></tr></table></figure>
+<h3 id="其余的比较运算符"><a href="#其余的比较运算符" class="headerlink" title="其余的比较运算符"></a>其余的比较运算符</h3><p>|  运算符   | 正向方法调用  | 反向方法调用 | 后备机制 |<br>|  —-  | —-  | —- | —- | —- |<br>| a==b | a.__eq__(b) | b.__eq__(a) | id(a) == id(b) |<br>| a!=b | a.__ne__(b) | b.__ne__(a) | not (a == b) |<br>| a&gt;b | a.__gt__(b) | b.__lt__(a) | 抛出TypeError |<br>| a&lt;b | a.__lt__(b) | b.__gt__(a) | 抛出TypeError |<br>| a&gt;=b | a.__ge__(b) | b.__le__(a) | 抛出TypeError |<br>| a&lt;=b | a.__le__(b) | b.__ge__(a) | 抛出TypeError |</p>
+]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>运算符重载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>yield与协程</title>
     <url>/2020/03/28/yield%20%E4%B8%8E%E5%8D%8F%E7%A8%8B/</url>
     <content><![CDATA[<h2 id="进程、线程与协程"><a href="#进程、线程与协程" class="headerlink" title="进程、线程与协程"></a>进程、线程与协程</h2><p>一般来说，进程是操作系统分配资源的最小单元；线程是操作系统进行调度的最小单元。而协程则相对不同，协程也拥有自己的独立的上下文，并且协程的切换由自己来控制。<br>与线程相比，协程避免了无意义的调度，此方面可以提升一定的性能。同时，由于需要程序自身完成调度，协程也失去了标准线程使用多CPU的能力。</p>
@@ -394,43 +378,6 @@
       </tags>
   </entry>
   <entry>
-    <title>使用future处理并发</title>
-    <url>/2020/04/11/%E4%BD%BF%E7%94%A8future%E5%A4%84%E7%90%86%E5%B9%B6%E5%8F%91/</url>
-    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>concurrent.future模块的主要特色是<strong>ThreadPoolExecutor</strong>以及<strong>ProcessPoolExecutor</strong>。这两个类实现的接口能分别在不同的线程或者进程中指定<strong>可调用对象</strong>。<br>这两个类在内部维护着一个工作的线程/进程池，以及要实现的任务队列。不过接口抽象的层级很高，一般的简单并发任务，无需关心实现的细节。</p>
-<a id="more"></a>
-<h2 id="future"><a href="#future" class="headerlink" title="future"></a>future</h2><p>Python3.4起，标准库中有两个名为Future的类：</p>
-<ul>
-<li><p>concurrent.futures.Future</p>
-</li>
-<li><p>asyncio.Feture<br>其Future的实例表示<strong>可能已经完成</strong>和<strong>尚未完成</strong>的延迟任务。<br>使用Future的实例封装待完成操作，可以将其放入队列，并且其完成的状态可以查询，获取结果/异常。<br>对于编程人员而言，没有特殊情况最好不要自己是实例化Future，而将这项任务交由并发框架完成。原因很简单：future表示终将要发生的事情。也就是说这项任务的执行时间已经排定了。因此，只有排定将某件事情交给concurent.futures.Executor子类处理的时候，才会创建concurrent.futures.Future实例。<br>同时，客户端的代码最好不要去改变future的状态，因为我们无法控制计算何时结束。<br>future的一些常用方法：</p>
-</li>
-<li><p>done()    方法不阻塞，返回的是布尔值，表明future链接的可调用对象是否已经调用结束。</p>
-</li>
-<li><p>add_done_callback(caller)        接受一个可调用对象，当future链接的可调用对象调用结束的时候，将其当作回调函数执行。</p>
-</li>
-<li><p>result()    当future运行结束的时候调用该方法，则返回可调用对象的结果/异常。</p>
-</li>
-</ul>
-<h2 id="excutor的submit和map"><a href="#excutor的submit和map" class="headerlink" title="excutor的submit和map"></a>excutor的submit和map</h2><p>实现一个下载任务的例子</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> concurrent.futures.thread <span class="keyword">import</span> ThreadPoolExecutor</span><br><span class="line"><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> as_completed</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">CC          = <span class="string">'CN IN US ID BP PK NG BD RU JP'</span>.split()</span><br><span class="line">BASE_URL    = <span class="string">'http://flupy.org/data/flags'</span></span><br><span class="line">DIR         = <span class="string">'/Users/livis/Desktop'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">save_flag</span><span class="params">(img, name)</span>:</span></span><br><span class="line">    path = os.path.join(DIR, name)</span><br><span class="line">    <span class="keyword">with</span> open(path, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(img)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span><span class="params">(text)</span>:</span></span><br><span class="line">    print(text, end=<span class="string">''</span>)</span><br><span class="line">    sys.stdout.flush()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_flag</span><span class="params">(cc)</span>:</span></span><br><span class="line">    url = <span class="string">'&#123;&#125;/&#123;&#125;/&#123;&#125;.gif'</span>.format(BASE_URL, cc.lower(), cc.lower())</span><br><span class="line">    res = requests.get(url)</span><br><span class="line">    <span class="keyword">return</span> res.content</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">download_one</span><span class="params">(cc)</span>:</span></span><br><span class="line">    image = get_flag(cc)</span><br><span class="line">    show(cc)</span><br><span class="line">    save_flag(image, cc.lower() + <span class="string">'.gif'</span>)</span><br><span class="line">    <span class="keyword">return</span> cc</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">download_many_map</span><span class="params">(ccs)</span>:</span></span><br><span class="line">    workers = len(ccs)</span><br><span class="line">    <span class="keyword">with</span> ThreadPoolExecutor(workers) <span class="keyword">as</span> executor:</span><br><span class="line">        res = executor.map(download_one, ccs)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> len(list(res))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">download_many_submit</span><span class="params">(ccs)</span>:</span></span><br><span class="line">    workers = len(ccs)</span><br><span class="line">    futures = list()</span><br><span class="line">    results = list()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">with</span> ThreadPoolExecutor(workers) <span class="keyword">as</span> executor:</span><br><span class="line">        <span class="keyword">for</span> cc <span class="keyword">in</span> ccs:</span><br><span class="line">            futures.append(executor.submit(download_one, cc))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> future <span class="keyword">in</span> as_completed(futures):</span><br><span class="line">            res = future.result()</span><br><span class="line"></span><br><span class="line">            results.append(res)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> len(results)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="comment"># download_many_submit(CC)</span></span><br><span class="line">    download_many_map(CC)</span><br></pre></td></tr></table></figure>
-<p>使用map，获取的结果顺序不会会变化。<br>而使用submit，获取的结果的顺序会发生改变。</p>
-<h2 id="显示任务处理进度"><a href="#显示任务处理进度" class="headerlink" title="显示任务处理进度"></a>显示任务处理进度</h2><p>为任务处理添加可视化的进度显示，可以使用TQDM模块实现。</p>
-<h3 id="最简单的tqdm示例"><a href="#最简单的tqdm示例" class="headerlink" title="最简单的tqdm示例"></a>最简单的tqdm示例</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> tqdm <span class="keyword">import</span> tqdm  </span><br><span class="line">In [<span class="number">2</span>]: <span class="keyword">import</span> time </span><br><span class="line">In [<span class="number">3</span>]: <span class="keyword">for</span> item <span class="keyword">in</span> tqdm(range(<span class="number">10</span>)): </span><br><span class="line">   ...:     time.sleep(<span class="number">0.2</span>) </span><br><span class="line">   ...:                                                                                                         </span><br><span class="line"><span class="number">100</span>%|████████████████████████████ <span class="number">10</span>/<span class="number">10</span> [<span class="number">00</span>:<span class="number">02</span>&lt;<span class="number">00</span>:<span class="number">00</span>,  <span class="number">4.91</span>it/s]</span><br></pre></td></tr></table></figure>
-<p>tqdm能够实现任何的可迭代对象，生成一个迭代器。使用这个迭代器的时候，显示进度条和完成全部迭代预计的剩余时间。</p>
-<h3 id="将任务进度和as-completed结合"><a href="#将任务进度和as-completed结合" class="headerlink" title="将任务进度和as_completed结合"></a>将任务进度和as_completed结合</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">download_many_submit</span><span class="params">(css)</span>:</span></span><br><span class="line">	......</span><br><span class="line">	<span class="keyword">with</span> ThreadPoolExecutor(workers) <span class="keyword">as</span> executor:</span><br><span class="line">	        <span class="keyword">for</span> cc <span class="keyword">in</span> ccs:</span><br><span class="line">	            futures.append(executor.submit(download_one, cc))</span><br><span class="line">	</span><br><span class="line">	        it = tqdm.tqdm(as_completed(futures), total=len(CC))</span><br><span class="line">	        <span class="keyword">for</span> future <span class="keyword">in</span> it:</span><br><span class="line">	            res = future.result()</span><br><span class="line">	</span><br><span class="line">	            results.append(res)</span><br><span class="line">	......</span><br></pre></td></tr></table></figure>
-<p>as_completed()返回的是个可迭代对象，因此可以使用tqdm。<br>需要注意的是，因为as_completed()无法使用len，所以需要显示的指定元素的数量，这样才能预计剩余的工作量。</p>
-]]></content>
-      <categories>
-        <category>Python</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-        <tag>多线程</tag>
-        <tag>并发</tag>
-        <tag>future</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>单例</title>
     <url>/2019/03/31/%E5%8D%95%E4%BE%8B/</url>
     <content><![CDATA[<h2 id="设计模式之单例"><a href="#设计模式之单例" class="headerlink" title="设计模式之单例"></a>设计模式之单例</h2><p>单例模式，属于创建类型中一种常见，也很简单的设计模式。如果一个类被设计成单例模式，那么它在整个进程/线程中将只有一个实例对象。</p>
@@ -496,6 +443,59 @@
       </categories>
       <tags>
         <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python 上下文管理</title>
+    <url>/2020/03/17/Python%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86%E5%99%A8/</url>
+    <content><![CDATA[<h2 id="if之外的else"><a href="#if之外的else" class="headerlink" title="if之外的else"></a>if之外的else</h2><p>在Python中，else子句不仅仅能在if语句中使用，还能在try、for、while语句中使用。<br>for/else、try/else、while/else的语言关系比较像，但是这些都和if/else差别和大，具体的行为如下解释。</p>
+<a id="more"></a>
+
+<blockquote>
+<p>除了if/else之外，else在其他语句中的含义更像是单词“then”，表示完成之后再做这件事情。</p>
+</blockquote>
+<h3 id="for-else"><a href="#for-else" class="headerlink" title="for/else"></a>for/else</h3><p>当for循环完整运行结束的时候，即for循环没有被break语句中止，才会运行else语句。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> <span class="string">"aabbccdd"</span>:</span><br><span class="line">	<span class="keyword">if</span> item == <span class="string">"a"</span>:</span><br><span class="line">		<span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	print(<span class="string">"1ok!"</span>)</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> <span class="string">"aabbccdd"</span>:</span><br><span class="line">	<span class="keyword">if</span> item == <span class="string">"a"</span>:</span><br><span class="line">		<span class="keyword">continue</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	print(<span class="string">"2ok!"</span>)</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> <span class="string">"aabbccdd"</span>:</span><br><span class="line">	<span class="keyword">pass</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	print(<span class="string">"3ok!"</span>)</span><br></pre></td></tr></table></figure>
+<p>第二个和第三个的for循环都是可以触法else的字语句的，而第一个for循环由于被break关键字打断，所以else不会被触法。</p>
+<h3 id="while-else"><a href="#while-else" class="headerlink" title="while/else"></a>while/else</h3><p>仅当while循环因为条件为假值而退出的时候，即没有被break语句打断，才会运行else语句。</p>
+<h3 id="try-else"><a href="#try-else" class="headerlink" title="try/else"></a>try/else</h3><p>当try语句块中没有异常抛出的时候才会运行esle语句块，并且，else语句块中抛出的异常不会被前面的except语句处理。<br>通常情况下，我们会这样描述try语句。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">	dangerous_call()</span><br><span class="line">	after_call()</span><br><span class="line"><span class="keyword">except</span> SmaeError:</span><br><span class="line">	handler_error()</span><br></pre></td></tr></table></figure>
+<p>但是为了更准确以及更加清晰，try语句块中应该只抛出预期的异常错误，而对于after_call()应该是当dangerous_call()没有出现异常的时候才去执行。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">	dangerous_call()</span><br><span class="line"><span class="keyword">except</span> SmaeError:</span><br><span class="line">	handler_error()</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	after_call()</span><br></pre></td></tr></table></figure>
+
+<h2 id="with语句"><a href="#with语句" class="headerlink" title="with语句"></a>with语句</h2><p>上下文管理器协议包含__enter__以及__exit__两个方法。with语句开始执行的时候，会在上下文管理器对象上调用__enter__方法，而当with语句结束的时候，__exit__也会被上下文管理对象来执行，用于处理可能出现的异常。</p>
+<blockquote>
+<p>和迭代器的存在是为了管理for语句一样，上下文管理器的存在目的是管理with语句。<br>with语句的目的是简化try/finally模式。用于保证一段代码运行完毕后执行某项操作。即便那段代码由于异常、&gt;  return语句或者sys.exit()调用而终止，也会执行指定的操作。<br>finally子句中的代码通常用于释放重要的资源，或者还原临时变更的状态。 </p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">WithTest</span>:</span></span><br><span class="line">···		<span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">···			print(<span class="string">"enter"</span>)</span><br><span class="line">···		</span><br><span class="line">···		<span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, exc_type, exc_value, traceback)</span>:</span></span><br><span class="line">···			print(<span class="string">"exit"</span>)</span><br><span class="line">		</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">with</span> WithTest():</span><br><span class="line">···		print(<span class="string">"doing sth!"</span>)</span><br><span class="line">···</span><br><span class="line">enter</span><br><span class="line">doing sth!</span><br><span class="line">exit</span><br></pre></td></tr></table></figure>
+<p>当上下文管理器对象的__enter__并没有实际返回值的时候，是可以不需要as子句的。<br>在with语句的时候，as子句的作用就是将__enter__的返回值绑定到as子句后面的变量上。</p>
+<h3 id="enter-和-exit"><a href="#enter-和-exit" class="headerlink" title="__enter__和__exit__"></a>__enter__和__exit__</h3><p>解释器在调用__enter__方法的时候，除了隐形的self，不会传入任何参数。然而在调用<strong>exit</strong>的时候，除了self之外，会传递三个参数：<strong>exc_type</strong>、<strong>exc_value</strong>、<strong>traceback</strong>。</p>
+<ul>
+<li>exc_type:    异常类，如TypeError。</li>
+<li>exc_value:    异常的实例，有时候会有参数传给异常构造方法，例如错误的消息，这些参数可以使用exc_value.args获取。</li>
+<li>traceback：    traceback对象。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WithTest</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, exc_type, exc_value, traceback)</span>:</span></span><br><span class="line">        print(exc_type)</span><br><span class="line">        print(exc_value)</span><br><span class="line">        print(traceback)</span><br><span class="line">        print(exc_value.args)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> WithTest():</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">"error"</span>)</span><br><span class="line">    </span><br><span class="line"><span class="string">""" 输出结果</span></span><br><span class="line"><span class="string">&lt;class 'Exception'&gt;</span></span><br><span class="line"><span class="string">error</span></span><br><span class="line"><span class="string">&lt;traceback object at 0x1008b7ac8&gt;</span></span><br><span class="line"><span class="string">('error',)</span></span><br><span class="line"><span class="string">Traceback (most recent call last):</span></span><br><span class="line"><span class="string">  File "/Users/livis/Desktop/notes/format_demo.py", line 55, in &lt;module&gt;</span></span><br><span class="line"><span class="string">    raise Exception("error")</span></span><br><span class="line"><span class="string">Exception: error</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="contextmanager装饰器"><a href="#contextmanager装饰器" class="headerlink" title="contextmanager装饰器"></a>contextmanager装饰器</h2><p>使用@contextmanager可以方便的创建由生成器函数构成的上下文管理器对象，可以极大的减少样本代码量。<br>在使用了@contextmanager装饰的生成器中，yield关键字是把函数的定义体分成两个部分，yield之前的部分就相当于__enter__方法执行的内容，而yield之后的部分就相当于__exit__方法执行的内容。而yield的内容就是__enter__返还的，可以使用as子语句绑定的返回对象。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> contextlib <span class="keyword">import</span> contextmanager</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@contextmanager</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">contenx_test</span><span class="params">(mystr)</span>:</span></span><br><span class="line">	print(<span class="string">"before enter!"</span>)</span><br><span class="line">	error = <span class="literal">None</span></span><br><span class="line">	<span class="keyword">try</span>:</span><br><span class="line">	    <span class="keyword">yield</span> mystr</span><br><span class="line">	<span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">	    error = e</span><br><span class="line">	<span class="keyword">finally</span>:</span><br><span class="line">	    print(<span class="string">"before exit!"</span>)</span><br><span class="line">	    <span class="keyword">if</span> error:</span><br><span class="line">	        print(error)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> demo(<span class="string">'abc'</span>) <span class="keyword">as</span> f:</span><br><span class="line">	print(<span class="string">"handle!"</span>)</span><br><span class="line">	<span class="keyword">raise</span> Exception(<span class="string">"some things"</span>)</span><br><span class="line"></span><br><span class="line">print(f)</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">before enter!</span></span><br><span class="line"><span class="string">handle!</span></span><br><span class="line"><span class="string">before exit!</span></span><br><span class="line"><span class="string">some things</span></span><br><span class="line"><span class="string">abc</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<p>context_test生成器被contextmanager装饰之后，就可以当作上下文管理器对象来使用。当使用with语句启动的时候：</p>
+<ul>
+<li>首先执行yield之前的内容，所以before enter被打印；</li>
+<li>接下来执行with语句块的内容，handle被打印；</li>
+<li>然后raise抛出了异常，触法了yield之后的内容，before exit和some things相继被打印；</li>
+<li>由于abc被yield返还， 被as子语句绑定到了f变量上，所以打印f变量的时候，输出的就是abc</li>
+</ul>
+<blockquote>
+<p>被contextmanager装饰器装饰的生成器中，yield关键字和迭代没有任何关系。与之相比，此处更像是协程，代码执行到某一点之后暂停，去执行客户代码，直到客户代码再次启动协程。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>上下文</tag>
       </tags>
   </entry>
   <entry>
@@ -952,20 +952,6 @@
       </tags>
   </entry>
   <entry>
-    <title>工具网站</title>
-    <url>/2019/08/31/%E6%94%B6%E5%BD%95%E7%9A%84%E5%87%A0%E4%B8%AA%E7%BD%91%E7%AB%99/</url>
-    <content><![CDATA[<h3 id="办公聚合工具"><a href="#办公聚合工具" class="headerlink" title="办公聚合工具"></a>办公聚合工具</h3><p>UZER : <a href="http://uzer.me/" target="_blank" rel="noopener">http://uzer.me</a></p>
-<a id="more"></a>
-<h3 id="格式转换神器"><a href="#格式转换神器" class="headerlink" title="格式转换神器"></a>格式转换神器</h3><p>CONVERTIO : <a href="https://convertio.co/zh/" target="_blank" rel="noopener">https://convertio.co/zh/</a></p>
-]]></content>
-      <categories>
-        <category>工具</category>
-      </categories>
-      <tags>
-        <tag>工具</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>工厂模式之抽象</title>
     <url>/2019/04/10/%E6%8A%BD%E8%B1%A1/</url>
     <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>对于抽象而言，往往用来表征对问题分析设计中得出的抽象概念，是一系列看上去不相同，但却具有相同本质的抽象。抽象是针对一系列具象来说的，对于具体业务场景的不同，我们对同一现实物体会具有不同的抽象结果表现。比如男人和女人，我们抽象出的抽象类可能是Human，而对于男人和狗，我们抽象出来的则可能会是Animal。</p>
@@ -1014,6 +1000,20 @@
       </categories>
       <tags>
         <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>工具网站</title>
+    <url>/2019/08/31/%E6%94%B6%E5%BD%95%E7%9A%84%E5%87%A0%E4%B8%AA%E7%BD%91%E7%AB%99/</url>
+    <content><![CDATA[<h3 id="办公聚合工具"><a href="#办公聚合工具" class="headerlink" title="办公聚合工具"></a>办公聚合工具</h3><p>UZER : <a href="http://uzer.me/" target="_blank" rel="noopener">http://uzer.me</a></p>
+<a id="more"></a>
+<h3 id="格式转换神器"><a href="#格式转换神器" class="headerlink" title="格式转换神器"></a>格式转换神器</h3><p>CONVERTIO : <a href="https://convertio.co/zh/" target="_blank" rel="noopener">https://convertio.co/zh/</a></p>
+]]></content>
+      <categories>
+        <category>工具</category>
+      </categories>
+      <tags>
+        <tag>工具</tag>
       </tags>
   </entry>
 </search>
